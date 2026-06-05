@@ -1086,8 +1086,8 @@ def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int 
 
         notes = []
 
-        notes.append(f"Target volume: {target_ml_local} ml")
-        notes.append(f"Target ABV: {target_abv_local:.1f} %")
+        notes.append(f"Cílový objem: {target_ml_local} ml")
+        notes.append(f"Cílový ABV: {target_abv_local:.1f} %")
 
         if conflicts == 0:
             notes.append("✅ Bez tvrdých konfliktů.")
