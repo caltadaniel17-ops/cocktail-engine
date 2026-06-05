@@ -96,25 +96,44 @@ def get_spirit_names():
 def _pretty(name):
     return name.replace("_", " ").title()
 
+_ALCOHOL_CAT_TO_KEY = {
+    "Spirits":               "spirits",
+    "Aperitifs & Vermouths": "aperitifs",
+    "Fortified Wines":       "fortified_wines",
+    "Liqueurs":              "liqueurs",
+    "Wines":                 "wines",
+    "Sparkling Wines":       "sparkling_wines",
+}
+
+def _cz_alcohol_cat(cat):
+    key = _ALCOHOL_CAT_TO_KEY.get(cat)
+    return flavor_data.CZ_ALCOHOL_CATEGORY.get(key, cat) if key else cat
+
+def _cz_ingredient(name):
+    return flavor_data.CZ_INGREDIENT_NAME.get(name, name.replace("_", " ").title())
+
+def _cz_ingredient_cat(cat):
+    return flavor_data.CZ_INGREDIENT_CATEGORY.get(cat, cat.replace("_", " ").title())
+
 def format_variant(result):
     # result is VariantResult dataclass from engine.py
     lines = []
-    core = f"**Spirit:** {_pretty(result.spirit)} | **Key:** {_pretty(result.key1)}"
+    core = f"**Spirit:** {_pretty(result.spirit)} | **Klíčová ingredience:** {_cz_ingredient(result.key1)}"
     if result.key2:
-        core += f" | **Key 2:** {_pretty(result.key2)}"
+        core += f" | **Key 2:** {_cz_ingredient(result.key2)}"
     lines.append(core)
     lines.append(f"**Příprava:** {result.preparation}")
     lines.append("")
     lines.append("**Recept (ml):**")
     lines.append(f"- **{_pretty(result.spirit)}**: {result.amounts_ml['spirit']} ml")
-    lines.append(f"- **{_pretty(result.key1)}**: {result.amounts_ml['key1']} ml")
+    lines.append(f"- **{_cz_ingredient(result.key1)}**: {result.amounts_ml['key1']} ml")
     if result.key2:
-        lines.append(f"- **{_pretty(result.key2)}**: {result.amounts_ml.get('key2', 0)} ml")
+        lines.append(f"- **{_cz_ingredient(result.key2)}**: {result.amounts_ml.get('key2', 0)} ml")
     for n in result.extras:
-        lines.append(f"- {_pretty(n)}: {result.amounts_ml[n]} ml")
+        lines.append(f"- {_cz_ingredient(n)}: {result.amounts_ml[n]} ml")
 
     lines.append("")
-    lines.append("**WHY IT WORKS:**")
+    lines.append("**PROČ TO FUNGUJE:**")
     for n in result.notes:
         lines.append(f"- {n}")
 
@@ -145,6 +164,7 @@ alcohol_category = st.sidebar.selectbox(
     "Kategorie alkoholu",
     options=ALCOHOL_CATEGORIES,
     index=ALCOHOL_CATEGORIES.index(_default_category),
+    format_func=_cz_alcohol_cat,
 )
 
 available_spirits = alcohol_mapping[alcohol_category]
@@ -164,9 +184,9 @@ all_ingredients = sorted(
 )
 
 ingredient_search = st.sidebar.text_input(
-    "Search ingredient",
+    "Hledat ingredienci",
     value="",
-    placeholder="Type e.g. apple, salt, mint...",
+    placeholder="Např. jablko, sůl, máta...",
 )
 
 if ingredient_search.strip():
@@ -179,9 +199,9 @@ if ingredient_search.strip():
     ]
 
     key1 = st.sidebar.selectbox(
-        "Key ingredient 1",
+        "Hlavní ingredience",
         options=matching_ingredients if matching_ingredients else all_ingredients,
-        format_func=lambda x: x.replace("_", " ").title(),
+        format_func=_cz_ingredient,
     )
 
 else:
@@ -195,38 +215,38 @@ else:
     )
 
     ingredient_category = st.sidebar.selectbox(
-        "Key ingredient category",
+        "Kategorie ingredience",
         options=ingredient_categories,
         index=ingredient_categories.index(default_key1_category)
         if default_key1_category in ingredient_categories
         else 0,
-        format_func=lambda x: x.replace("_", " ").title(),
+        format_func=_cz_ingredient_cat,
     )
 
     available_ingredients = grouped_ingredients[ingredient_category]
 
     key1 = st.sidebar.selectbox(
-        "Key ingredient 1",
+        "Hlavní ingredience",
         options=available_ingredients,
         index=available_ingredients.index(default_key1)
         if default_key1 in available_ingredients
         else 0,
-        format_func=lambda x: x.replace("_", " ").title(),
+        format_func=_cz_ingredient,
     )
 
-use_key2 = st.sidebar.checkbox("Použít druhou klíčovou ingredienci (key2)", value=False)
+use_key2 = st.sidebar.checkbox("Přidat druhou ingredienci", value=False)
 key2 = None
 if use_key2:
     # prevent same as key1
-    key2_options = [n for n in ingredient_names if n != key1]
-    key2 = st.sidebar.selectbox("Key ingredient 2", key2_options)
+    key2_options = [n for n in all_ingredients if n != key1]
+    key2 = st.sidebar.selectbox("Druhá ingredience", key2_options, format_func=_cz_ingredient)
 
 target_ml = 90
 
 current_params = (spirit, key1, key2, target_ml)
 
 if st.session_state.last_inputs is not None and current_params != st.session_state.last_inputs:
-    st.info("Parametry se změnily. Klikni na 'Generate variants' pro přepočet.")
+    st.info("Parametry se změnily. Klikni na 'Generovat varianty' pro přepočet.")
 
 
 # Session state for "Generate more"
@@ -236,8 +256,8 @@ if "last_inputs" not in st.session_state:
     st.session_state.last_inputs = None
 
 col1, col2 = st.columns(2)
-generate_clicked = col1.button("Generate variants")
-more_clicked = col2.button("Generate more")
+generate_clicked = col1.button("Generovat varianty")
+more_clicked = col2.button("Generovat další")
 
 def run_generation(increment_seed: bool):
     # Use deterministic seed changes so "3 more" gives different results
@@ -277,7 +297,7 @@ if more_clicked:
         except Exception as e:
             st.error(f"Něco se pokazilo: {type(e).__name__}: {e}")
     else:
-        st.warning("Nejdřív klikni na 'Generate variants' se stejnými vstupy, pak můžeš generovat další.")
+        st.warning("Nejdřív klikni na 'Generovat varianty' se stejnými vstupy, pak můžeš generovat další.")
 
 # ---- render persisted results ----
 

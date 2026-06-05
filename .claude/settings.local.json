@@ -2,7 +2,11 @@
   "permissions": {
     "allow": [
       "Bash(python3 *)",
-      "Bash(python *)"
+      "Bash(python *)",
+      "Skill(run)",
+      "Bash(streamlit run *)",
+      "Bash(curl -s http://localhost:8501)",
+      "Bash(pip3 show *)"
     ]
   }
 }
