@@ -1636,6 +1636,582 @@ INGREDIENTS: List[Ingredient] = [
         "temperature": "fresh",
         "abv": 0,
     },
+
+    # ---- Fruit & spice modifiers ----
+
+    # lemon variants
+    {
+        "name": "lemon_fresh",
+        "families": ["terpene_citrus", "aldehyde_fatty"],
+        "intensity": 5,
+        "roles": ["acid", "bridge", "aromatic"],
+        "taste": {"sweet": 0, "acid": 3, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "lemon_juice",
+        "families": ["terpene_citrus", "aldehyde_fatty"],
+        "intensity": 4,
+        "roles": ["acid", "bridge", "aromatic"],
+        "taste": {"sweet": 0, "acid": 3, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "lemon_cordial",
+        "families": ["terpene_citrus", "aldehyde_fatty"],
+        "intensity": 3,
+        "roles": ["sweet", "bridge", "aromatic"],
+        "taste": {"sweet": 2, "acid": 2, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # lime variants
+    {
+        "name": "lime_fresh",
+        "families": ["terpene_citrus", "green_leafy"],
+        "intensity": 5,
+        "roles": ["acid", "bridge"],
+        "taste": {"sweet": 0, "acid": 3, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "lime_juice",
+        "families": ["terpene_citrus", "green_leafy"],
+        "intensity": 4,
+        "roles": ["acid", "bridge"],
+        "taste": {"sweet": 0, "acid": 3, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "lime_cordial",
+        "families": ["terpene_citrus", "green_leafy"],
+        "intensity": 3,
+        "roles": ["sweet", "bridge"],
+        "taste": {"sweet": 2, "acid": 2, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # grapefruit variants
+    {
+        "name": "grapefruit_fresh",
+        "families": ["terpene_citrus", "tannic_dry"],
+        "intensity": 4,
+        "roles": ["acid", "support"],
+        "taste": {"sweet": 1, "acid": 3, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "grapefruit_juice",
+        "families": ["terpene_citrus", "tannic_dry"],
+        "intensity": 3,
+        "roles": ["acid", "support"],
+        "taste": {"sweet": 1, "acid": 2, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "grapefruit_cordial",
+        "families": ["terpene_citrus", "tannic_dry"],
+        "intensity": 2,
+        "roles": ["sweet", "support"],
+        "taste": {"sweet": 3, "acid": 1, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # orange variants
+    {
+        "name": "orange_fresh",
+        "families": ["terpene_citrus", "ester_fruity"],
+        "intensity": 3,
+        "roles": ["identity", "sweet"],
+        "taste": {"sweet": 2, "acid": 2, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "orange_juice",
+        "families": ["terpene_citrus", "ester_fruity"],
+        "intensity": 2,
+        "roles": ["identity", "sweet"],
+        "taste": {"sweet": 2, "acid": 1, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "orange_cordial",
+        "families": ["terpene_citrus", "ester_fruity"],
+        "intensity": 1,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 0, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # yuzu variants
+    {
+        "name": "yuzu_fresh",
+        "families": ["terpene_citrus", "floral_ionone"],
+        "intensity": 5,
+        "roles": ["acid", "aromatic"],
+        "taste": {"sweet": 1, "acid": 3, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "yuzu_juice",
+        "families": ["terpene_citrus", "floral_ionone"],
+        "intensity": 4,
+        "roles": ["acid", "aromatic"],
+        "taste": {"sweet": 1, "acid": 3, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "yuzu_cordial",
+        "families": ["terpene_citrus", "floral_ionone"],
+        "intensity": 3,
+        "roles": ["sweet", "aromatic"],
+        "taste": {"sweet": 3, "acid": 2, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # bergamot variants
+    {
+        "name": "bergamot_fresh",
+        "families": ["terpene_citrus", "floral_ionone"],
+        "intensity": 5,
+        "roles": ["acid", "aromatic"],
+        "taste": {"sweet": 0, "acid": 3, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "bergamot_juice",
+        "families": ["terpene_citrus", "floral_ionone"],
+        "intensity": 4,
+        "roles": ["acid", "aromatic"],
+        "taste": {"sweet": 0, "acid": 2, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "bergamot_cordial",
+        "families": ["terpene_citrus", "floral_ionone"],
+        "intensity": 3,
+        "roles": ["sweet", "aromatic"],
+        "taste": {"sweet": 2, "acid": 1, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # blood_orange variants
+    {
+        "name": "blood_orange_fresh",
+        "families": ["terpene_citrus", "tannic_dry"],
+        "intensity": 4,
+        "roles": ["acid", "identity"],
+        "taste": {"sweet": 1, "acid": 3, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "blood_orange_juice",
+        "families": ["terpene_citrus", "tannic_dry"],
+        "intensity": 3,
+        "roles": ["acid", "identity"],
+        "taste": {"sweet": 1, "acid": 2, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "blood_orange_cordial",
+        "families": ["terpene_citrus", "tannic_dry"],
+        "intensity": 2,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 1, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # mandarin variants
+    {
+        "name": "mandarin_fresh",
+        "families": ["terpene_citrus", "ester_fruity"],
+        "intensity": 3,
+        "roles": ["acid", "sweet"],
+        "taste": {"sweet": 2, "acid": 2, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "mandarin_juice",
+        "families": ["terpene_citrus", "ester_fruity"],
+        "intensity": 2,
+        "roles": ["acid", "sweet"],
+        "taste": {"sweet": 2, "acid": 1, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "mandarin_cordial",
+        "families": ["terpene_citrus", "ester_fruity"],
+        "intensity": 1,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 0, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # kaffir_lime variants
+    {
+        "name": "kaffir_lime_fresh",
+        "families": ["terpene_citrus", "green_leafy"],
+        "intensity": 5,
+        "roles": ["acid", "aromatic"],
+        "taste": {"sweet": 0, "acid": 3, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "kaffir_lime_juice",
+        "families": ["terpene_citrus", "green_leafy"],
+        "intensity": 5,
+        "roles": ["acid", "aromatic"],
+        "taste": {"sweet": 0, "acid": 2, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "kaffir_lime_cordial",
+        "families": ["terpene_citrus", "green_leafy"],
+        "intensity": 4,
+        "roles": ["sweet", "aromatic"],
+        "taste": {"sweet": 2, "acid": 1, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # pineapple variants
+    {
+        "name": "pineapple_fresh",
+        "families": ["ester_fruity", "terpene_citrus"],
+        "intensity": 4,
+        "roles": ["identity", "sweet", "bridge"],
+        "taste": {"sweet": 2, "acid": 3, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "pineapple_juice",
+        "families": ["ester_fruity", "terpene_citrus"],
+        "intensity": 3,
+        "roles": ["identity", "sweet", "bridge"],
+        "taste": {"sweet": 2, "acid": 2, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "pineapple_cordial",
+        "families": ["ester_fruity", "terpene_citrus"],
+        "intensity": 2,
+        "roles": ["sweet", "identity", "bridge"],
+        "taste": {"sweet": 3, "acid": 1, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # mango variants
+    {
+        "name": "mango_fresh",
+        "families": ["ester_fruity", "lactone_creamy"],
+        "intensity": 4,
+        "roles": ["identity", "sweet"],
+        "taste": {"sweet": 2, "acid": 2, "bitter": 0, "umami": 0, "spice": 0, "fat": 1},
+        "temperature": "fresh",
+    },
+    {
+        "name": "mango_juice",
+        "families": ["ester_fruity", "lactone_creamy"],
+        "intensity": 3,
+        "roles": ["identity", "sweet"],
+        "taste": {"sweet": 2, "acid": 1, "bitter": 0, "umami": 0, "spice": 0, "fat": 1},
+        "temperature": "fresh",
+    },
+    {
+        "name": "mango_cordial",
+        "families": ["ester_fruity", "lactone_creamy"],
+        "intensity": 2,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 0, "bitter": 0, "umami": 0, "spice": 0, "fat": 1},
+        "temperature": "neutral",
+    },
+
+    # passion_fruit variants
+    {
+        "name": "passion_fruit_fresh",
+        "families": ["ester_fruity", "terpene_citrus"],
+        "intensity": 5,
+        "roles": ["identity", "acid"],
+        "taste": {"sweet": 1, "acid": 3, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "passion_fruit_juice",
+        "families": ["ester_fruity", "terpene_citrus"],
+        "intensity": 4,
+        "roles": ["identity", "acid"],
+        "taste": {"sweet": 1, "acid": 3, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "passion_fruit_cordial",
+        "families": ["ester_fruity", "terpene_citrus"],
+        "intensity": 3,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 2, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # banana variants
+    {
+        "name": "banana_fresh",
+        "families": ["ester_fruity", "lactone_creamy"],
+        "intensity": 4,
+        "roles": ["identity", "fatty"],
+        "taste": {"sweet": 2, "acid": 1, "bitter": 0, "umami": 0, "spice": 0, "fat": 1},
+        "temperature": "fresh",
+    },
+    {
+        "name": "banana_juice",
+        "families": ["ester_fruity", "lactone_creamy"],
+        "intensity": 3,
+        "roles": ["identity", "sweet"],
+        "taste": {"sweet": 2, "acid": 0, "bitter": 0, "umami": 0, "spice": 0, "fat": 1},
+        "temperature": "fresh",
+    },
+    {
+        "name": "banana_cordial",
+        "families": ["ester_fruity", "lactone_creamy"],
+        "intensity": 2,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 0, "bitter": 0, "umami": 0, "spice": 0, "fat": 1},
+        "temperature": "neutral",
+    },
+
+    # strawberry variants
+    {
+        "name": "strawberry_fresh",
+        "families": ["ester_fruity", "floral_ionone"],
+        "intensity": 3,
+        "roles": ["identity", "sweet"],
+        "taste": {"sweet": 2, "acid": 2, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "strawberry_juice",
+        "families": ["ester_fruity", "floral_ionone"],
+        "intensity": 2,
+        "roles": ["identity", "sweet"],
+        "taste": {"sweet": 2, "acid": 1, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "strawberry_cordial",
+        "families": ["ester_fruity", "floral_ionone"],
+        "intensity": 1,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 0, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # raspberry variants
+    {
+        "name": "raspberry_fresh",
+        "families": ["ester_fruity", "tannic_dry"],
+        "intensity": 4,
+        "roles": ["identity", "acid"],
+        "taste": {"sweet": 1, "acid": 3, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "raspberry_juice",
+        "families": ["ester_fruity", "tannic_dry"],
+        "intensity": 3,
+        "roles": ["identity", "acid"],
+        "taste": {"sweet": 1, "acid": 2, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "raspberry_cordial",
+        "families": ["ester_fruity", "tannic_dry"],
+        "intensity": 2,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 1, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # blackberry variants
+    {
+        "name": "blackberry_fresh",
+        "families": ["ester_fruity", "tannic_dry"],
+        "intensity": 4,
+        "roles": ["identity", "dry"],
+        "taste": {"sweet": 1, "acid": 2, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "blackberry_juice",
+        "families": ["ester_fruity", "tannic_dry"],
+        "intensity": 3,
+        "roles": ["identity", "dry"],
+        "taste": {"sweet": 1, "acid": 1, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "blackberry_cordial",
+        "families": ["ester_fruity", "tannic_dry"],
+        "intensity": 2,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 0, "bitter": 1, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # green_apple variants
+    {
+        "name": "green_apple_fresh",
+        "families": ["ester_fruity", "green_leafy"],
+        "intensity": 3,
+        "roles": ["identity", "bridge"],
+        "taste": {"sweet": 1, "acid": 2, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "green_apple_juice",
+        "families": ["ester_fruity", "green_leafy"],
+        "intensity": 2,
+        "roles": ["identity", "bridge"],
+        "taste": {"sweet": 1, "acid": 1, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "green_apple_cordial",
+        "families": ["ester_fruity", "green_leafy"],
+        "intensity": 1,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 0, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # pear variants
+    {
+        "name": "pear_fresh",
+        "families": ["ester_fruity", "floral_ionone"],
+        "intensity": 3,
+        "roles": ["identity", "sweet"],
+        "taste": {"sweet": 1, "acid": 2, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "pear_juice",
+        "families": ["ester_fruity", "floral_ionone"],
+        "intensity": 2,
+        "roles": ["identity", "sweet"],
+        "taste": {"sweet": 1, "acid": 1, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "pear_cordial",
+        "families": ["ester_fruity", "floral_ionone"],
+        "intensity": 1,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 0, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # watermelon variants
+    {
+        "name": "watermelon_fresh",
+        "families": ["green_leafy", "ester_fruity"],
+        "intensity": 3,
+        "roles": ["identity", "sweet", "bridge"],
+        "taste": {"sweet": 2, "acid": 2, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "watermelon_juice",
+        "families": ["green_leafy", "ester_fruity"],
+        "intensity": 2,
+        "roles": ["identity", "sweet"],
+        "taste": {"sweet": 2, "acid": 1, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "watermelon_cordial",
+        "families": ["green_leafy", "ester_fruity"],
+        "intensity": 1,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 0, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # green_grape variants
+    {
+        "name": "green_grape_fresh",
+        "families": ["ester_fruity", "green_leafy"],
+        "intensity": 3,
+        "roles": ["identity", "sweet"],
+        "taste": {"sweet": 2, "acid": 2, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "green_grape_juice",
+        "families": ["ester_fruity", "green_leafy"],
+        "intensity": 2,
+        "roles": ["identity", "sweet"],
+        "taste": {"sweet": 2, "acid": 1, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "fresh",
+    },
+    {
+        "name": "green_grape_cordial",
+        "families": ["ester_fruity", "green_leafy"],
+        "intensity": 1,
+        "roles": ["sweet", "identity"],
+        "taste": {"sweet": 3, "acid": 0, "bitter": 0, "umami": 0, "spice": 0, "fat": 0},
+        "temperature": "neutral",
+    },
+
+    # ginger variants
+    {
+        "name": "ginger_tea",
+        "families": ["terpene_herbal", "spice_volatile"],
+        "intensity": 4,
+        "roles": ["identity", "bridge"],
+        "taste": {"sweet": 0, "acid": 1, "bitter": 0, "umami": 0, "spice": 2, "fat": 0},
+        "temperature": "neutral",
+    },
+    {
+        "name": "ginger_syrup",
+        "families": ["terpene_herbal", "spice_volatile"],
+        "intensity": 3,
+        "roles": ["sweet", "bridge"],
+        "taste": {"sweet": 2, "acid": 1, "bitter": 0, "umami": 0, "spice": 2, "fat": 0},
+        "temperature": "warm",
+    },
+
+    # cardamom variants
+    {
+        "name": "cardamom_tea",
+        "families": ["spice_volatile", "terpene_herbal"],
+        "intensity": 4,
+        "roles": ["aromatic", "bridge"],
+        "taste": {"sweet": 0, "acid": 0, "bitter": 0, "umami": 0, "spice": 2, "fat": 0},
+        "temperature": "neutral",
+    },
+    {
+        "name": "cardamom_syrup",
+        "families": ["spice_volatile", "terpene_herbal"],
+        "intensity": 3,
+        "roles": ["sweet", "aromatic", "bridge"],
+        "taste": {"sweet": 2, "acid": 0, "bitter": 0, "umami": 0, "spice": 2, "fat": 0},
+        "temperature": "warm",
+    },
+
+    # cinnamon variants
+    {
+        "name": "cinnamon_tea",
+        "families": ["spice_volatile", "caramelized"],
+        "intensity": 3,
+        "roles": ["aromatic", "bridge"],
+        "taste": {"sweet": 0, "acid": 0, "bitter": 0, "umami": 0, "spice": 2, "fat": 0},
+        "temperature": "neutral",
+    },
+    {
+        "name": "cinnamon_syrup",
+        "families": ["spice_volatile", "caramelized"],
+        "intensity": 2,
+        "roles": ["sweet", "aromatic", "bridge"],
+        "taste": {"sweet": 3, "acid": 0, "bitter": 0, "umami": 0, "spice": 2, "fat": 0},
+        "temperature": "warm",
+    },
 ]
 
 
@@ -1761,7 +2337,7 @@ for item in INGREDIENTS:
     elif any(x in name for x in ["strawberry", "raspberry", "blackberry", "blueberry", "cherry"]):
         UI_INGREDIENT_CATEGORY_BY_NAME[name] = "berries"
 
-    elif any(x in name for x in ["cinnamon", "cardamom", "clove", "nutmeg", "pepper", "vanilla", "star_anise"]):
+    elif any(x in name for x in ["cinnamon", "cardamom", "clove", "nutmeg", "pepper", "vanilla", "star_anise", "ginger"]):
         UI_INGREDIENT_CATEGORY_BY_NAME[name] = "spices"
 
     elif any(x in name for x in ["mint", "basil", "rosemary", "sage", "thyme", "shiso"]):
@@ -1960,4 +2536,74 @@ CZ_INGREDIENT_NAME: Dict[str, str] = {
     "cola":                "Cola",
     "pink_tonic":          "Růžový tonik",
     "lemonade":            "Limonáda",
+
+    # Fruit modifier variants
+    "lemon_fresh":              "Citron (čerstvá šťáva)",
+    "lemon_juice":              "Citron (džus)",
+    "lemon_cordial":            "Citron (cordial)",
+    "lime_fresh":               "Limetka (čerstvá šťáva)",
+    "lime_juice":               "Limetka (džus)",
+    "lime_cordial":             "Limetka (cordial)",
+    "grapefruit_fresh":         "Grep (čerstvá šťáva)",
+    "grapefruit_juice":         "Grep (džus)",
+    "grapefruit_cordial":       "Grep (cordial)",
+    "orange_fresh":             "Pomeranč (čerstvá šťáva)",
+    "orange_juice":             "Pomeranč (džus)",
+    "orange_cordial":           "Pomeranč (cordial)",
+    "yuzu_fresh":               "Yuzu (čerstvá šťáva)",
+    "yuzu_juice":               "Yuzu (džus)",
+    "yuzu_cordial":             "Yuzu (cordial)",
+    "bergamot_fresh":           "Bergamot (čerstvá šťáva)",
+    "bergamot_juice":           "Bergamot (džus)",
+    "bergamot_cordial":         "Bergamot (cordial)",
+    "blood_orange_fresh":       "Krvavý pomeranč (čerstvá šťáva)",
+    "blood_orange_juice":       "Krvavý pomeranč (džus)",
+    "blood_orange_cordial":     "Krvavý pomeranč (cordial)",
+    "mandarin_fresh":           "Mandarinka (čerstvá šťáva)",
+    "mandarin_juice":           "Mandarinka (džus)",
+    "mandarin_cordial":         "Mandarinka (cordial)",
+    "kaffir_lime_fresh":        "Kafírová limetka (čerstvá šťáva)",
+    "kaffir_lime_juice":        "Kafírová limetka (džus)",
+    "kaffir_lime_cordial":      "Kafírová limetka (cordial)",
+    "pineapple_fresh":          "Ananas (čerstvá šťáva)",
+    "pineapple_juice":          "Ananas (džus)",
+    "pineapple_cordial":        "Ananas (cordial)",
+    "mango_fresh":              "Mango (čerstvá šťáva)",
+    "mango_juice":              "Mango (džus)",
+    "mango_cordial":            "Mango (cordial)",
+    "passion_fruit_fresh":      "Marakuja (čerstvá šťáva)",
+    "passion_fruit_juice":      "Marakuja (džus)",
+    "passion_fruit_cordial":    "Marakuja (cordial)",
+    "banana_fresh":             "Banán (čerstvá šťáva)",
+    "banana_juice":             "Banán (džus)",
+    "banana_cordial":           "Banán (cordial)",
+    "strawberry_fresh":         "Jahoda (čerstvá šťáva)",
+    "strawberry_juice":         "Jahoda (džus)",
+    "strawberry_cordial":       "Jahoda (cordial)",
+    "raspberry_fresh":          "Malina (čerstvá šťáva)",
+    "raspberry_juice":          "Malina (džus)",
+    "raspberry_cordial":        "Malina (cordial)",
+    "blackberry_fresh":         "Ostružina (čerstvá šťáva)",
+    "blackberry_juice":         "Ostružina (džus)",
+    "blackberry_cordial":       "Ostružina (cordial)",
+    "green_apple_fresh":        "Zelené jablko (čerstvá šťáva)",
+    "green_apple_juice":        "Zelené jablko (džus)",
+    "green_apple_cordial":      "Zelené jablko (cordial)",
+    "pear_fresh":               "Hruška (čerstvá šťáva)",
+    "pear_juice":               "Hruška (džus)",
+    "pear_cordial":             "Hruška (cordial)",
+    "watermelon_fresh":         "Vodní meloun (čerstvá šťáva)",
+    "watermelon_juice":         "Vodní meloun (džus)",
+    "watermelon_cordial":       "Vodní meloun (cordial)",
+    "green_grape_fresh":        "Zelené hrozny (čerstvá šťáva)",
+    "green_grape_juice":        "Zelené hrozny (džus)",
+    "green_grape_cordial":      "Zelené hrozny (cordial)",
+
+    # Spice modifier variants
+    "ginger_tea":               "Zázvorový čaj",
+    "ginger_syrup":             "Zázvorový sirup",
+    "cardamom_tea":             "Kardamomový čaj",
+    "cardamom_syrup":           "Kardamomový sirup",
+    "cinnamon_tea":             "Skořicový čaj",
+    "cinnamon_syrup":           "Skořicový sirup",
 }
