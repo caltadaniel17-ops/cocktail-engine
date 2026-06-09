@@ -1,6 +1,7 @@
 import streamlit as st
 import flavor_data
 import engine
+import favourites
 
 ALCOHOL_CATEGORIES = [
     "Spirits",
@@ -151,6 +152,30 @@ def format_variant(result):
 
 # -------- Sidebar inputs --------
 st.sidebar.header("Nastavení")
+
+# -------- Oblíbené --------
+st.sidebar.divider()
+st.sidebar.subheader("Oblíbené")
+if st.sidebar.button("📋 Zobrazit uložené varianty"):
+    try:
+        saved = favourites.load_favourites()
+        if saved:
+            st.sidebar.success(f"Načteno {len(saved)} uložených variant.")
+            for row in saved:
+                with st.sidebar.expander(f"{row.get('Datum','')} — {row.get('Název','')}"):
+                    st.write(f"**Spirit:** {row.get('Spirit','')}")
+                    st.write(f"**Key1:** {row.get('Key1','')}")
+                    if row.get("Key2"):
+                        st.write(f"**Key2:** {row.get('Key2','')}")
+                    st.write(f"**Recept:** {row.get('Recept','')}")
+                    st.write(f"**Příprava:** {row.get('Příprava','')}")
+                    if row.get("Poznámka"):
+                        st.write(f"**Poznámka:** {row.get('Poznámka','')}")
+        else:
+            st.sidebar.info("Zatím žádné uložené varianty.")
+    except Exception as e:
+        st.sidebar.error(f"Chyba při načítání: {e}")
+st.sidebar.divider()
 
 alcohol_mapping = build_new_alcohol_mapping()
 
@@ -307,6 +332,17 @@ if st.session_state.results:
         style = r.title[r.title.find("(")+1:r.title.rfind(")")] if "(" in r.title else r.title
         with st.expander(f"Variant {i}: {style}", expanded=(i == 1)):
             st.markdown(format_variant(r))
+            note_key = f"note_{i}"
+            saved_key = f"saved_{i}"
+            note = st.text_input("Poznámka (volitelné)", key=note_key, placeholder="Např. skvělé pro léto...")
+            if st.button("⭐ Uložit variantu", key=f"save_{i}"):
+                try:
+                    favourites.save_favourite(r, note)
+                    st.session_state[saved_key] = True
+                except Exception as e:
+                    st.error(f"Chyba při ukládání: {e}")
+            if st.session_state.get(saved_key):
+                st.success("✅ Varianta uložena!")
 
 if do_generate:
     try:

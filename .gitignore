@@ -1,0 +1,9 @@
+# Service account credentials — NEVER commit
+gcp_service_account.json
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.pyc
+.env
+gcp_service_account.json
