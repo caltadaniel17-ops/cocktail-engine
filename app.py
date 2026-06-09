@@ -221,6 +221,7 @@ if ingredient_search.strip():
         name
         for name in all_ingredients
         if search_text in name.lower()
+        or search_text in flavor_data.CZ_INGREDIENT_NAME.get(name, "").lower()
     ]
 
     key1 = st.sidebar.selectbox(
