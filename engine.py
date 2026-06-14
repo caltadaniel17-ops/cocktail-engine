@@ -11,6 +11,7 @@ from dataclasses import dataclass
 from typing import List, Dict, Tuple, Optional
 
 import flavor_data
+import classic_cocktails
 
 def get_category_build_rule(title: str) -> dict:
     for category, rule in flavor_data.CATEGORY_BUILD_RULES.items():
@@ -774,16 +775,33 @@ def analyze_harmony(spirit_fams: List[str], key_fams: List[str], extras: List[st
 # ml allocation (pre-dilution)
 # -----------------------------
 
-def base_allocate_ml(extras: List[str], target_ml: int) -> Dict[str, float]:
-    """
-    Simple bar-friendly allocation you tuned:
-    - key1 fixed at 20 ml (entity-level)
-    - acid 10 ml each
-    - sweet 15 ml each
-    - support 5 ml each
-    - accent 2.5 ml each
-    - spirit = rest
-    """
+# keywords used to detect "top_up" extras (carbonated / lengthening components)
+_TOP_UP_KEYWORDS = (
+    "tonic", "soda", "cola", "ginger_beer", "ginger_ale", "ginger",
+    "champagne", "prosecco", "cava", "pet_nat", "cremant", "sparkling",
+    "lemonade", "grapefruit_soda",
+)
+
+# style strings as used in classic_cocktails (longest first so substrings don't shadow)
+_CLASSIC_STYLES = [
+    "Highball / Swizzle",
+    "Signature Twist",
+    "Short Cocktail",
+    "Spritz",
+    "Sour",
+]
+
+
+def _style_from_title(title: str) -> str:
+    """Extract the classic-cocktails style name from a variant title."""
+    for style in _CLASSIC_STYLES:
+        if style in title:
+            return style
+    return ""
+
+
+def _legacy_allocate_ml(extras: List[str]) -> Dict[str, float]:
+    """Original bar-friendly role allocation (fallback when no template matches)."""
     ml: Dict[str, float] = {}
     acids = [n for n in extras if has_role(n, "acid")]
     sweets = [n for n in extras if has_role(n, "sweet")]
@@ -799,6 +817,77 @@ def base_allocate_ml(extras: List[str], target_ml: int) -> Dict[str, float]:
         ml[s] = 5.0
     for a in accents:
         ml[a] = 2.5
+
+    return ml
+
+
+def base_allocate_ml(extras: List[str], target_ml: int,
+                     spirit: Optional[str] = None, title: str = "") -> Dict[str, float]:
+    """
+    Template-based ml allocation driven by classic_cocktails.
+
+    Resolves the spirit type + variant style to the closest classic-cocktail
+    template, then distributes the template's per-role ml across the extras:
+      - acid extras     → template["acid"]     / count of acids
+      - sweet extras    → template["sweet"]    / count of sweets
+      - modifier extras → template["modifier"] / count of modifiers
+      - top_up extras   → template["top_up"]
+      - egg_white       → template["egg_white"] if present else 10 ml
+      - everything else → template["other"]    / count of others
+
+    key1 is fixed at 20 ml and spirit is the remainder — both handled by the
+    caller. Falls back to the legacy role allocation when no spirit/title is
+    given or the style is unknown.
+    """
+    if spirit is None:
+        return _legacy_allocate_ml(extras)
+
+    spirit_type = classic_cocktails.get_spirit_type(spirit)
+    style = _style_from_title(title)
+    template = classic_cocktails.find_best_template(style, spirit_type)
+    if not template:
+        return _legacy_allocate_ml(extras)
+
+    ml: Dict[str, float] = {}
+
+    egg_whites = [n for n in extras if n == "egg_white"]
+    acids = [n for n in extras if n not in egg_whites and has_role(n, "acid")]
+    sweets = [n for n in extras if n not in egg_whites and n not in acids and has_role(n, "sweet")]
+    modifiers = [
+        n for n in extras
+        if n not in egg_whites and n not in acids and n not in sweets
+        and ing(n).get("alcohol_type") == "modifier"
+    ]
+    consumed = set(egg_whites) | set(acids) | set(sweets) | set(modifiers)
+    top_ups = [
+        n for n in extras
+        if n not in consumed and any(kw in n for kw in _TOP_UP_KEYWORDS)
+    ]
+    consumed |= set(top_ups)
+    others = [n for n in extras if n not in consumed]
+
+    def _share(role: str, items: List[str]) -> None:
+        total = template.get(role, 0.0)
+        if items and total:
+            per = total / len(items)
+            for n in items:
+                ml[n] = per
+
+    _share("acid", acids)
+    _share("sweet", sweets)
+    _share("modifier", modifiers)
+
+    for n in egg_whites:
+        ml[n] = template.get("egg_white", 10.0)
+
+    for n in top_ups:
+        ml[n] = template.get("top_up", 0.0)
+
+    other_total = template.get("other", 0.0)
+    if others:
+        per_other = (other_total / len(others)) if other_total else 5.0
+        for n in others:
+            ml[n] = per_other
 
     return ml
 
@@ -1029,8 +1118,8 @@ def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int 
                 else:
                     extras_ml[n] = 5.0
         else:
-            extras_ml = base_allocate_ml(extras2, target_ml_local)
-            extras_ml = apply_micro_bridge_adjustments(extras2, extras_ml, inserts, target_ml_local) 
+            extras_ml = base_allocate_ml(extras2, target_ml_local, spirit, title)
+            extras_ml = apply_micro_bridge_adjustments(extras2, extras_ml, inserts, target_ml_local)
 
         # compute spirit from category build rule
         non_spirit_total = key1_ml + key2_ml + sum(extras_ml.get(n, 0.0) for n in extras2)
