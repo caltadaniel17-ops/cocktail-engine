@@ -110,11 +110,51 @@ def _cz_alcohol_cat(cat):
     key = _ALCOHOL_CAT_TO_KEY.get(cat)
     return flavor_data.CZ_ALCOHOL_CATEGORY.get(key, cat) if key else cat
 
+# Suffix → jak ho zobrazit v UI. _fresh se zobrazuje bez závorky.
+_VARIANT_SUFFIX_LABEL = {
+    "_fresh":   None,
+    "_juice":   "džus",
+    "_cordial": "cordial",
+    "_syrup":   "sirup",
+    "_tea":     "čaj",
+}
+
+
+def _hidden_originals():
+    """Originální ingredience, které mají _fresh variantu, a tak se v UI skrývají."""
+    hidden = set()
+    for name in flavor_data.INGREDIENT_BY_NAME:
+        if name.endswith("_fresh"):
+            base = name[: -len("_fresh")]
+            if base in flavor_data.INGREDIENT_BY_NAME:
+                hidden.add(base)
+    return hidden
+
+
+HIDDEN_ORIGINALS = _hidden_originals()
+
+
+def _visible_ingredients(names):
+    return [n for n in names if n not in HIDDEN_ORIGINALS]
+
+
 def _cz_ingredient(name):
+    # Pokud jde o variantu (např. green_apple_juice), odvoď zobrazení z base názvu.
+    for suffix, label in _VARIANT_SUFFIX_LABEL.items():
+        if name.endswith(suffix):
+            base = name[: -len(suffix)]
+            if base in flavor_data.INGREDIENT_BY_NAME:
+                base_cz = flavor_data.CZ_INGREDIENT_NAME.get(
+                    base, base.replace("_", " ").title()
+                )
+                return base_cz if label is None else f"{base_cz} ({label})"
     return flavor_data.CZ_INGREDIENT_NAME.get(name, name.replace("_", " ").title())
 
-def _cz_ingredient_cat(cat):
-    return flavor_data.CZ_INGREDIENT_CATEGORY.get(cat, cat.replace("_", " ").title())
+def _cz_main_cat(key):
+    return flavor_data.CZ_MAIN_CATEGORY.get(key, key.replace("_", " ").title())
+
+def _cz_subcat(key):
+    return flavor_data.CZ_SUBCATEGORY.get(key, key.replace("_", " ").title())
 
 def format_variant(result):
     # result is VariantResult dataclass from engine.py
@@ -204,7 +244,7 @@ spirit = st.sidebar.selectbox(
 grouped_ingredients = build_grouped_ingredient_options()
 
 all_ingredients = sorted(
-    flavor_data.UI_INGREDIENT_CATEGORY_BY_NAME.keys(),
+    _visible_ingredients(flavor_data.UI_INGREDIENT_CATEGORY_BY_NAME.keys()),
     key=lambda x: x.lower(),
 )
 
@@ -231,34 +271,57 @@ if ingredient_search.strip():
     )
 
 else:
-    ingredient_categories = list(grouped_ingredients.keys())
+    _default_key1 = "green_apple_fresh"
+    _main_cats = list(flavor_data.SUBCATEGORIES_BY_MAIN.keys())
+    _default_main = flavor_data.UI_INGREDIENT_MAIN_CATEGORY.get(_default_key1, _main_cats[0])
 
-    default_key1 = "green_apple"
-
-    default_key1_category = flavor_data.UI_INGREDIENT_CATEGORY_BY_NAME.get(
-        default_key1,
-        ingredient_categories[0],
+    main_cat = st.sidebar.selectbox(
+        "Hlavní kategorie",
+        options=_main_cats,
+        index=_main_cats.index(_default_main) if _default_main in _main_cats else 0,
+        format_func=_cz_main_cat,
     )
 
-    ingredient_category = st.sidebar.selectbox(
-        "Kategorie ingredience",
-        options=ingredient_categories,
-        index=ingredient_categories.index(default_key1_category)
-        if default_key1_category in ingredient_categories
-        else 0,
-        format_func=_cz_ingredient_cat,
-    )
+    _subcats = flavor_data.SUBCATEGORIES_BY_MAIN[main_cat]
 
-    available_ingredients = grouped_ingredients[ingredient_category]
+    if _subcats is None:
+        # Flat category — no subcategory level, go straight to ingredients
+        _available = sorted(
+            _visible_ingredients(
+                n for n, mc in flavor_data.UI_INGREDIENT_MAIN_CATEGORY.items() if mc == main_cat
+            ),
+            key=lambda x: x.lower(),
+        )
+        key1 = st.sidebar.selectbox(
+            "Hlavní ingredience",
+            options=_available,
+            format_func=_cz_ingredient,
+        )
+    else:
+        _default_subcat = flavor_data.UI_INGREDIENT_CATEGORY_BY_NAME.get(_default_key1)
+        if _default_subcat not in _subcats:
+            _default_subcat = _subcats[0]
 
-    key1 = st.sidebar.selectbox(
-        "Hlavní ingredience",
-        options=available_ingredients,
-        index=available_ingredients.index(default_key1)
-        if default_key1 in available_ingredients
-        else 0,
-        format_func=_cz_ingredient,
-    )
+        subcat = st.sidebar.selectbox(
+            "Podkategorie",
+            options=_subcats,
+            index=_subcats.index(_default_subcat) if _default_subcat in _subcats else 0,
+            format_func=_cz_subcat,
+        )
+
+        _available = sorted(
+            _visible_ingredients(
+                n for n, sc in flavor_data.UI_INGREDIENT_CATEGORY_BY_NAME.items() if sc == subcat
+            ),
+            key=lambda x: x.lower(),
+        )
+
+        key1 = st.sidebar.selectbox(
+            "Hlavní ingredience",
+            options=_available,
+            index=_available.index(_default_key1) if _default_key1 in _available else 0,
+            format_func=_cz_ingredient,
+        )
 
 use_key2 = st.sidebar.checkbox("Přidat druhou ingredienci", value=False)
 key2 = None

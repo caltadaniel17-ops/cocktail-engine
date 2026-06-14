@@ -2310,104 +2310,187 @@ for item in INGREDIENTS:
         else:
             UI_CATEGORY_BY_NAME[name] = "liqueurs"
 
-# Non-alcohol ingredient categories
-for item in INGREDIENTS:
+# Non-alcohol ingredient categories — explicit main + subcategory mapping
 
-    name = item["name"]
+_INGR_MAIN: Dict[str, str] = {
+    # OVOCE
+    **{n: "ovoce" for n in [
+        "lemon", "lemon_fresh",
+        "lime", "lime_fresh",
+        "grapefruit", "grapefruit_fresh",
+        "orange", "orange_fresh",
+        "yuzu", "yuzu_fresh",
+        "bergamot", "bergamot_fresh",
+        "blood_orange", "blood_orange_fresh",
+        "mandarin", "mandarin_fresh",
+        "kaffir_lime", "kaffir_lime_fresh",
+        "pineapple", "pineapple_fresh",
+        "mango", "mango_fresh",
+        "passion_fruit", "passion_fruit_fresh",
+        "banana", "banana_fresh",
+        "coconut_milk",
+        "green_apple", "green_apple_fresh",
+        "pear", "pear_fresh",
+        "strawberry", "strawberry_fresh",
+        "raspberry", "raspberry_fresh",
+        "blackberry", "blackberry_fresh",
+        "watermelon", "watermelon_fresh",
+        "green_grape", "green_grape_fresh",
+    ]},
+    # DŽUSY
+    **{n: "dzusy" for n in [
+        "lemon_juice", "lime_juice", "grapefruit_juice", "orange_juice",
+        "yuzu_juice", "bergamot_juice", "blood_orange_juice", "mandarin_juice",
+        "kaffir_lime_juice", "calamansi",
+        "pineapple_juice", "mango_juice", "passion_fruit_juice",
+        "strawberry_juice", "raspberry_juice", "blackberry_juice",
+        "green_apple_juice", "pear_juice", "watermelon_juice",
+        "green_grape_juice", "banana_juice",
+    ]},
+    # SLADIDLA & SIRUPY
+    **{n: "sladidla_sirupy" for n in [
+        "honey", "maple_syrup", "white_sugar", "brown_sugar", "agave",
+        "lemon_cordial", "lime_cordial", "grapefruit_cordial", "orange_cordial",
+        "yuzu_cordial", "bergamot_cordial", "blood_orange_cordial",
+        "mandarin_cordial", "kaffir_lime_cordial",
+        "pineapple_cordial", "mango_cordial", "passion_fruit_cordial",
+        "banana_cordial", "strawberry_cordial", "raspberry_cordial",
+        "blackberry_cordial", "green_apple_cordial", "pear_cordial",
+        "watermelon_cordial", "green_grape_cordial",
+        "ginger_syrup", "cardamom_syrup", "cinnamon_syrup",
+    ]},
+    # ZELENINA & BYLINY
+    **{n: "zelenina_byliny" for n in [
+        "cucumber", "celery", "tomato", "parsley", "shiso",
+        "mint", "basil", "rosemary", "thyme", "sage", "coriander_leaf",
+        "lavender", "rose", "hibiscus", "elderflower",
+        "orange_blossom", "chamomile", "jasmine",
+    ]},
+    # KOŘENÍ & SUCHÉ
+    **{n: "koreni_suche" for n in [
+        "cardamom", "cinnamon", "clove", "star_anise",
+        "pink_pepper", "allspice", "ginger",
+        "green_tea", "black_tea", "red_berries_tea",
+        "oolong", "lapsang_souchong",
+        "ginger_tea", "cardamom_tea", "cinnamon_tea",
+        "espresso", "cocoa", "toasted_almond", "cocoa_nib",
+        "hazelnut", "sesame", "peanut", "walnut",
+    ]},
+    # MLÉČNÉ & TUKY
+    **{n: "mlecne_tuky" for n in ["cream", "egg_white", "yogurt", "olive_oil"]},
+    # MOŘSKÉ & UMAMI
+    **{n: "morske_umami" for n in [
+        "sea_salt", "saline_solution", "mineral_water", "oyster_shell",
+        "white_sesame_salt", "seaweed", "miso", "black_garlic",
+        "gentian", "dandelion", "grapefruit_zest",
+    ]},
+    # TOP-UP NÁPOJE
+    **{n: "topup_napoje" for n in [
+        "soda_water", "tonic_water", "ginger_beer", "ginger_ale",
+        "sprite", "cola", "pink_tonic", "lemonade",
+    ]},
+}
 
-    # skip alcohol ingredients
-    if name in UI_CATEGORY_BY_NAME:
-        continue
+_INGR_SUBCAT: Dict[str, str] = {
+    # OVOCE subcategories
+    **{n: "citrusy" for n in [
+        "lemon", "lemon_fresh", "lime", "lime_fresh",
+        "grapefruit", "grapefruit_fresh", "orange", "orange_fresh",
+        "yuzu", "yuzu_fresh", "bergamot", "bergamot_fresh",
+        "blood_orange", "blood_orange_fresh", "mandarin", "mandarin_fresh",
+        "kaffir_lime", "kaffir_lime_fresh",
+    ]},
+    **{n: "tropicke_ovoce" for n in [
+        "pineapple", "pineapple_fresh", "mango", "mango_fresh",
+        "passion_fruit", "passion_fruit_fresh", "banana", "banana_fresh",
+        "coconut_milk",
+    ]},
+    **{n: "zahradni_ovoce" for n in [
+        "green_apple", "green_apple_fresh", "pear", "pear_fresh",
+    ]},
+    **{n: "bobule" for n in [
+        "strawberry", "strawberry_fresh", "raspberry", "raspberry_fresh",
+        "blackberry", "blackberry_fresh",
+    ]},
+    **{n: "melouny" for n in [
+        "watermelon", "watermelon_fresh", "green_grape", "green_grape_fresh",
+    ]},
+    # DŽUSY subcategories
+    **{n: "citrusove_dzusy" for n in [
+        "lemon_juice", "lime_juice", "grapefruit_juice", "orange_juice",
+        "yuzu_juice", "bergamot_juice", "blood_orange_juice", "mandarin_juice",
+        "kaffir_lime_juice", "calamansi",
+    ]},
+    **{n: "ovocne_dzusy" for n in [
+        "pineapple_juice", "mango_juice", "passion_fruit_juice",
+        "strawberry_juice", "raspberry_juice", "blackberry_juice",
+        "green_apple_juice", "pear_juice", "watermelon_juice",
+        "green_grape_juice", "banana_juice",
+    ]},
+    # SLADIDLA & SIRUPY subcategories
+    **{n: "sladidla" for n in [
+        "honey", "maple_syrup", "white_sugar", "brown_sugar", "agave",
+    ]},
+    **{n: "sirupy_cordialy" for n in [
+        "lemon_cordial", "lime_cordial", "grapefruit_cordial", "orange_cordial",
+        "yuzu_cordial", "bergamot_cordial", "blood_orange_cordial",
+        "mandarin_cordial", "kaffir_lime_cordial",
+        "pineapple_cordial", "mango_cordial", "passion_fruit_cordial",
+        "banana_cordial", "strawberry_cordial", "raspberry_cordial",
+        "blackberry_cordial", "green_apple_cordial", "pear_cordial",
+        "watermelon_cordial", "green_grape_cordial",
+        "ginger_syrup", "cardamom_syrup", "cinnamon_syrup",
+    ]},
+    # ZELENINA & BYLINY subcategories
+    **{n: "zelenina" for n in ["cucumber", "celery", "tomato", "parsley", "shiso"]},
+    **{n: "bylinky" for n in [
+        "mint", "basil", "rosemary", "thyme", "sage", "coriander_leaf",
+    ]},
+    **{n: "floralni" for n in [
+        "lavender", "rose", "hibiscus", "elderflower",
+        "orange_blossom", "chamomile", "jasmine",
+    ]},
+    # KOŘENÍ & SUCHÉ subcategories
+    **{n: "koreni" for n in [
+        "cardamom", "cinnamon", "clove", "star_anise",
+        "pink_pepper", "allspice", "ginger",
+    ]},
+    **{n: "caje" for n in [
+        "green_tea", "black_tea", "red_berries_tea",
+        "oolong", "lapsang_souchong",
+        "ginger_tea", "cardamom_tea", "cinnamon_tea",
+    ]},
+    **{n: "kava_cokolada" for n in [
+        "espresso", "cocoa", "toasted_almond", "cocoa_nib",
+    ]},
+    **{n: "orechy_seminky" for n in ["hazelnut", "sesame", "peanut", "walnut"]},
+    # Categories without subcategories — use main category key as subcategory
+    **{n: "mlecne_tuky" for n in ["cream", "egg_white", "yogurt", "olive_oil"]},
+    **{n: "morske_umami" for n in [
+        "sea_salt", "saline_solution", "mineral_water", "oyster_shell",
+        "white_sesame_salt", "seaweed", "miso", "black_garlic",
+        "gentian", "dandelion", "grapefruit_zest",
+    ]},
+    **{n: "topup_napoje" for n in [
+        "soda_water", "tonic_water", "ginger_beer", "ginger_ale",
+        "sprite", "cola", "pink_tonic", "lemonade",
+    ]},
+}
 
-    families = item.get("families", [])
-    roles = item.get("roles", [])
+UI_INGREDIENT_MAIN_CATEGORY: Dict[str, str] = _INGR_MAIN
+UI_INGREDIENT_CATEGORY_BY_NAME.update(_INGR_SUBCAT)
 
-    if name in ["soda_water", "tonic_water", "ginger_beer", "ginger_ale", "sprite", "cola", "pink_tonic", "lemonade"]:
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "top_up"
-
-    elif any(x in name for x in ["lemon", "lime", "grapefruit", "orange", "yuzu"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "citrus"
-
-    elif any(x in name for x in ["pineapple", "mango", "passionfruit", "banana", "coconut"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "tropical_fruits"
-
-    elif any(x in name for x in ["apple", "pear", "peach", "apricot", "plum", "fig"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "orchard_fruits"
-
-    elif any(x in name for x in ["strawberry", "raspberry", "blackberry", "blueberry", "cherry"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "berries"
-
-    elif any(x in name for x in ["cinnamon", "cardamom", "clove", "nutmeg", "pepper", "vanilla", "star_anise", "ginger"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "spices"
-
-    elif any(x in name for x in ["mint", "basil", "rosemary", "sage", "thyme", "shiso"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "herbs"
-
-    elif "floral" in families:
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "floral"
-
-    elif "nut" in name or "almond" in name or "hazelnut" in name:
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "nuts"
-
-    elif "coffee" in name or "cacao" in name or "chocolate" in name:
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "coffee_chocolate"
-
-    elif "tea" in name:
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "tea"
-
-    elif any(x in name for x in ["sea_salt", "white_sesame_salt", "salt"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "salts"
-
-    elif any(x in name for x in ["seaweed"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "marine"
-
-    elif any(x in name for x in ["sesame"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "seeds"
-
-    elif any(x in name for x in ["tomato"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "vegetables"
-
-    elif any(x in name for x in ["watermelon"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "melon"
-
-    elif any(x in name for x in ["white_sugar", "sugar"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "sweeteners"
-
-    elif any(x in name for x in ["yogurt"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "dairy"
-
-    elif any(x in name for x in ["maple_syrup"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "sweeteners"
-
-    elif any(x in name for x in ["mineral_water"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "water"
-
-    elif any(x in name for x in ["miso"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "umami"
-
-    elif any(x in name for x in ["olive_oil"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "oils"
-
-    elif any(x in name for x in ["oolong"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "tea"
-
-    elif any(x in name for x in ["oyster_shell"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "marine"
-
-    elif any(x in name for x in ["parsley"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "herbs"
-
-    elif any(x in name for x in ["passion_fruit"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "tropical_fruits"
-
-    elif any(x in name for x in ["rose"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "floral"
-
-    elif any(x in name for x in ["saline_solution"]):
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "salts"
-
-    else:
-        UI_INGREDIENT_CATEGORY_BY_NAME[name] = "other"
+# Subcategory lists per main category; None means no subcategories (ingredients shown directly)
+SUBCATEGORIES_BY_MAIN: Dict[str, list] = {
+    "ovoce":           ["citrusy", "tropicke_ovoce", "zahradni_ovoce", "bobule", "melouny"],
+    "dzusy":           ["citrusove_dzusy", "ovocne_dzusy"],
+    "sladidla_sirupy": ["sladidla", "sirupy_cordialy"],
+    "zelenina_byliny": ["zelenina", "bylinky", "floralni"],
+    "koreni_suche":    ["koreni", "caje", "kava_cokolada", "orechy_seminky"],
+    "mlecne_tuky":     None,
+    "morske_umami":    None,
+    "topup_napoje":    None,
+}
 
 # -------------------------
 # Czech UI translations
@@ -2422,29 +2505,38 @@ CZ_ALCOHOL_CATEGORY: Dict[str, str] = {
     "liqueurs":        "Liqueury",
 }
 
-CZ_INGREDIENT_CATEGORY: Dict[str, str] = {
-    "citrus":           "Citrusy",
-    "tropical_fruits":  "Tropické ovoce",
-    "orchard_fruits":   "Zahradní ovoce",
-    "berries":          "Bobule",
-    "spices":           "Koření",
-    "herbs":            "Bylinky",
-    "floral":           "Květinové",
-    "nuts":             "Ořechy",
-    "coffee_chocolate": "Káva a čokoláda",
-    "tea":              "Čaje",
-    "salts":            "Soli",
-    "marine":           "Mořské",
-    "seeds":            "Semínka",
-    "vegetables":       "Zelenina",
-    "melon":            "Melouny",
-    "sweeteners":       "Sladidla",
-    "dairy":            "Mléčné",
-    "water":            "Voda",
-    "umami":            "Umami",
-    "oils":             "Oleje",
-    "top_up":           "Doplňkové nápoje",
-    "other":            "Ostatní",
+CZ_MAIN_CATEGORY: Dict[str, str] = {
+    "ovoce":           "Ovoce",
+    "dzusy":           "Džusy",
+    "sladidla_sirupy": "Sladidla & Sirupy",
+    "zelenina_byliny": "Zelenina & Byliny",
+    "koreni_suche":    "Koření & Suché",
+    "mlecne_tuky":     "Mléčné & Tuky",
+    "morske_umami":    "Mořské & Umami",
+    "topup_napoje":    "Top-up nápoje",
+}
+
+CZ_SUBCATEGORY: Dict[str, str] = {
+    "citrusy":         "Citrusy",
+    "tropicke_ovoce":  "Tropické ovoce",
+    "zahradni_ovoce":  "Zahradní ovoce",
+    "bobule":          "Bobule",
+    "melouny":         "Melouny",
+    "citrusove_dzusy": "Citrusové džusy",
+    "ovocne_dzusy":    "Ovocné džusy",
+    "sladidla":        "Sladidla",
+    "sirupy_cordialy": "Sirupy & Cordialy",
+    "zelenina":        "Zelenina",
+    "bylinky":         "Bylinky",
+    "floralni":        "Florální",
+    "koreni":          "Koření",
+    "caje":            "Čaje",
+    "kava_cokolada":   "Káva & Čokoláda",
+    "orechy_seminky":  "Ořechy & Semínka",
+    # main-cat keys reused as subcategory for flat categories
+    "mlecne_tuky":     "Mléčné & Tuky",
+    "morske_umami":    "Mořské & Umami",
+    "topup_napoje":    "Top-up nápoje",
 }
 
 CZ_INGREDIENT_NAME: Dict[str, str] = {
