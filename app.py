@@ -208,11 +208,13 @@ h1 {
     background-color: #F8F9FA !important;
 }
 [data-testid="stExpander"] {
-    background-color: #FFFFFF;
+    background-color: rgba(255,255,255,0.95) !important;
     border: 1px solid #E9ECEF !important;
     border-radius: 12px !important;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     margin-bottom: 12px;
+    position: relative !important;
+    z-index: 1 !important;
 }
 [data-testid="stExpander"] summary {
     background-color: #1B4332 !important;
@@ -420,10 +422,95 @@ div[data-baseweb="popover"] ul li:hover {
 [data-testid="collapsedControl"] { display: none !important; }
 section[data-testid="stSidebar"] { min-width: 240px !important; }
 button[kind="header"] { display: none !important; }
+[data-testid="stAppViewContainer"] > .main {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='600' height='400'%3E%3Cline x1='80' y1='60' x2='240' y2='100' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='240' y1='100' x2='400' y2='50' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='400' y1='50' x2='540' y2='90' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='80' y1='60' x2='150' y2='200' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='240' y1='100' x2='300' y2='220' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='400' y1='50' x2='440' y2='190' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='540' y1='90' x2='570' y2='210' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='150' y1='200' x2='300' y2='220' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='300' y1='220' x2='440' y2='190' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='440' y1='190' x2='570' y2='210' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='150' y1='200' x2='100' y2='340' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='300' y1='220' x2='280' y2='360' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='440' y1='190' x2='430' y2='355' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Cline x1='570' y1='210' x2='560' y2='350' stroke='%231B4332' stroke-width='0.8' opacity='0.12'/%3E%3Ccircle cx='80' cy='60' r='18' fill='%23FFF9E6' stroke='%2352B788' stroke-width='1.2' opacity='0.7'/%3E%3Ctext x='80' y='65' text-anchor='middle' font-size='14' opacity='0.8'%3E%F0%9F%8D%8B%3C/text%3E%3Ccircle cx='240' cy='100' r='18' fill='%23E8F5E9' stroke='%2352B788' stroke-width='1.2' opacity='0.7'/%3E%3Ctext x='240' y='105' text-anchor='middle' font-size='14' opacity='0.8'%3E%F0%9F%8C%BF%3C/text%3E%3Ccircle cx='400' cy='50' r='18' fill='%23FFF3E0' stroke='%2352B788' stroke-width='1.2' opacity='0.7'/%3E%3Ctext x='400' y='55' text-anchor='middle' font-size='14' opacity='0.8'%3E%F0%9F%8D%8A%3C/text%3E%3Ccircle cx='540' cy='90' r='18' fill='%23FFF8E1' stroke='%2352B788' stroke-width='1.2' opacity='0.7'/%3E%3Ctext x='540' y='95' text-anchor='middle' font-size='14' opacity='0.8'%3E%F0%9F%8D%AF%3C/text%3E%3Ccircle cx='150' cy='200' r='18' fill='%23FFF0F0' stroke='%2352B788' stroke-width='1.2' opacity='0.7'/%3E%3Ctext x='150' y='205' text-anchor='middle' font-size='14' opacity='0.8'%3E%F0%9F%8D%93%3C/text%3E%3Ccircle cx='300' cy='220' r='18' fill='%23FFFDE7' stroke='%2352B788' stroke-width='1.2' opacity='0.7'/%3E%3Ctext x='300' y='225' text-anchor='middle' font-size='14' opacity='0.8'%3E%F0%9F%8D%8D%3C/text%3E%3Ccircle cx='440' cy='190' r='18' fill='%23E8F5E9' stroke='%2352B788' stroke-width='1.2' opacity='0.7'/%3E%3Ctext x='440' y='195' text-anchor='middle' font-size='14' opacity='0.8'%3E%F0%9F%8C%B1%3C/text%3E%3Ccircle cx='570' cy='210' r='18' fill='%23FCE4EC' stroke='%2352B788' stroke-width='1.2' opacity='0.7'/%3E%3Ctext x='570' y='215' text-anchor='middle' font-size='14' opacity='0.8'%3E%F0%9F%AB%90%3C/text%3E%3Ccircle cx='100' cy='340' r='18' fill='%23F1F8E9' stroke='%2352B788' stroke-width='1.2' opacity='0.7'/%3E%3Ctext x='100' y='345' text-anchor='middle' font-size='14' opacity='0.8'%3E%F0%9F%A5%A5%3C/text%3E%3Ccircle cx='280' cy='360' r='18' fill='%23FFF8E1' stroke='%2352B788' stroke-width='1.2' opacity='0.7'/%3E%3Ctext x='280' y='365' text-anchor='middle' font-size='14' opacity='0.8'%3E%F0%9F%8D%AF%3C/text%3E%3Ccircle cx='430' cy='355' r='18' fill='%23F3E5D5' stroke='%2352B788' stroke-width='1.2' opacity='0.7'/%3E%3Ctext x='430' y='360' text-anchor='middle' font-size='14' opacity='0.8'%3E%E2%98%95%3C/text%3E%3Ccircle cx='560' cy='350' r='18' fill='%23F1F8E9' stroke='%2352B788' stroke-width='1.2' opacity='0.7'/%3E%3Ctext x='560' y='355' text-anchor='middle' font-size='14' opacity='0.8'%3E%F0%9F%8D%88%3C/text%3E%3C/svg%3E");
+    background-repeat: repeat;
+    background-size: 600px 400px;
+    background-attachment: fixed;
+}
 </style>
 """,
     unsafe_allow_html=True,
 )
+
+st.markdown("""
+<div style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:0;pointer-events:none;">
+<svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+  <line x1="5%" y1="8%" x2="18%" y2="22%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="18%" y1="22%" x2="35%" y2="12%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="35%" y1="12%" x2="52%" y2="28%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="52%" y1="28%" x2="71%" y2="15%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="71%" y1="15%" x2="88%" y2="25%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="5%" y1="8%" x2="12%" y2="42%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="18%" y1="22%" x2="28%" y2="48%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="35%" y1="12%" x2="42%" y2="45%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="52%" y1="28%" x2="58%" y2="52%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="71%" y1="15%" x2="78%" y2="44%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="88%" y1="25%" x2="92%" y2="48%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="12%" y1="42%" x2="28%" y2="48%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="28%" y1="48%" x2="42%" y2="45%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="42%" y1="45%" x2="58%" y2="52%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="58%" y1="52%" x2="78%" y2="44%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="78%" y1="44%" x2="92%" y2="48%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="12%" y1="42%" x2="8%" y2="72%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="28%" y1="48%" x2="22%" y2="75%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="42%" y1="45%" x2="48%" y2="78%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="58%" y1="52%" x2="65%" y2="72%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="78%" y1="44%" x2="82%" y2="70%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="92%" y1="48%" x2="94%" y2="72%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="8%" y1="72%" x2="22%" y2="75%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="22%" y1="75%" x2="35%" y2="88%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="48%" y1="78%" x2="65%" y2="72%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="65%" y1="72%" x2="82%" y2="70%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="82%" y1="70%" x2="90%" y2="88%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="35%" y1="88%" x2="48%" y2="78%" stroke="#1B4332" stroke-width="0.7" opacity="0.15"/>
+  <line x1="18%" y1="22%" x2="42%" y2="45%" stroke="#1B4332" stroke-width="0.7" opacity="0.10"/>
+  <line x1="52%" y1="28%" x2="78%" y2="44%" stroke="#1B4332" stroke-width="0.7" opacity="0.10"/>
+  <line x1="28%" y1="48%" x2="58%" y2="52%" stroke="#1B4332" stroke-width="0.7" opacity="0.10"/>
+
+  <circle cx="5%" cy="8%" r="16" fill="#FFF9E6" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="5%" y="8.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🍋</text>
+  <circle cx="18%" cy="22%" r="16" fill="#E8F5E9" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="18%" y="22.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🌿</text>
+  <circle cx="35%" cy="12%" r="16" fill="#FFF3E0" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="35%" y="12.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🍊</text>
+  <circle cx="52%" cy="28%" r="16" fill="#FFFDE7" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="52%" y="28.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🍍</text>
+  <circle cx="71%" cy="15%" r="16" fill="#FFF0F0" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="71%" y="15.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🍓</text>
+  <circle cx="88%" cy="25%" r="16" fill="#FFF8E1" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="88%" y="25.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🫚</text>
+  <circle cx="12%" cy="42%" r="16" fill="#FFF0F6" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="12%" y="42.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🌸</text>
+  <circle cx="28%" cy="48%" r="16" fill="#F1F8E9" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="28%" y="48.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🥥</text>
+  <circle cx="42%" cy="45%" r="16" fill="#FFF8E1" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="42%" y="45.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🍯</text>
+  <circle cx="58%" cy="52%" r="16" fill="#F3E5D5" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="58%" y="52.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">☕</text>
+  <circle cx="78%" cy="44%" r="16" fill="#F1F8E9" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="78%" y="44.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🍈</text>
+  <circle cx="92%" cy="48%" r="16" fill="#EAF3DE" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="92%" y="48.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🌱</text>
+  <circle cx="8%" cy="72%" r="16" fill="#FFF9E6" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="8%" y="72.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🍋</text>
+  <circle cx="22%" cy="75%" r="16" fill="#FCE4EC" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="22%" y="75.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🫐</text>
+  <circle cx="35%" cy="88%" r="16" fill="#FFF3E0" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="35%" y="88.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🍊</text>
+  <circle cx="48%" cy="78%" r="16" fill="#E8F5E9" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="48%" y="78.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🌿</text>
+  <circle cx="65%" cy="72%" r="16" fill="#FFFDE7" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="65%" y="72.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🍍</text>
+  <circle cx="82%" cy="70%" r="16" fill="#FFF8E1" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="82%" y="70.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🍯</text>
+  <circle cx="90%" cy="88%" r="16" fill="#F3E5D5" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="90%" y="88.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">☕</text>
+  <circle cx="94%" cy="72%" r="16" fill="#FFF0F0" stroke="#52B788" stroke-width="1.2" opacity="0.75"/>
+  <text x="94%" y="72.5%" text-anchor="middle" dominant-baseline="middle" font-size="13" opacity="0.85">🍓</text>
+</svg>
+</div>
+""", unsafe_allow_html=True)
 
 st.markdown("""
 <script>
@@ -613,6 +700,7 @@ if st.sidebar.button("📋 Zobrazit uložené varianty", key="show_saved"):
         saved = favourites.load_favourites()
         if saved:
             st.sidebar.success(f"Načteno {len(saved)} uložených variant.")
+            st.sidebar.markdown('<div style="max-height:420px;overflow-y:auto;padding-right:4px;">', unsafe_allow_html=True)
             for row in saved:
                 with st.sidebar.expander(f"{row.get('Datum','')} — {row.get('Název','')}"):
                     st.write(f"**Spirit:** {row.get('Spirit','')}")
@@ -623,6 +711,7 @@ if st.sidebar.button("📋 Zobrazit uložené varianty", key="show_saved"):
                     st.write(f"**Příprava:** {row.get('Příprava','')}")
                     if row.get("Poznámka"):
                         st.write(f"**Poznámka:** {row.get('Poznámka','')}")
+            st.sidebar.markdown('</div>', unsafe_allow_html=True)
         else:
             st.sidebar.info("Zatím žádné uložené varianty.")
     except Exception as e:
@@ -817,6 +906,7 @@ if st.session_state.results:
                 st.markdown(bridges)
             note_key = f"note_{i}"
             saved_key = f"saved_{i}"
+            st.markdown('<p style="color:#1B4332;font-weight:600;font-size:14px;margin-bottom:4px;">Poznámka (volitelné)</p>', unsafe_allow_html=True)
             note = st.text_input("Poznámka (volitelné)", key=note_key, placeholder="Např. skvělé pro léto...")
             if st.button("⭐ Uložit variantu", key=f"save_{i}", type="secondary", use_container_width=True):
                 try:
