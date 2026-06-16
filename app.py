@@ -425,6 +425,30 @@ button[kind="header"] { display: none !important; }
     unsafe_allow_html=True,
 )
 
+st.markdown("""
+<script>
+function fixStyles() {
+    const style = document.createElement('style');
+    style.innerHTML = `
+        [data-baseweb="popover"] { background: white !important; }
+        [data-baseweb="popover"] div { background: white !important; color: #1A1A1A !important; }
+        [data-baseweb="popover"] li { background: white !important; color: #1A1A1A !important; }
+        [data-baseweb="popover"] li:hover { background: #E8F5E9 !important; }
+        input[type="checkbox"] {
+            accent-color: #1B4332 !important;
+            width: 16px !important;
+            height: 16px !important;
+            border: 2px solid #52B788 !important;
+            outline: 2px solid #52B788 !important;
+        }
+    `;
+    document.head.appendChild(style);
+}
+setTimeout(fixStyles, 500);
+setTimeout(fixStyles, 1500);
+</script>
+""", unsafe_allow_html=True)
+
 if "results" not in st.session_state:
     st.session_state.results = []
 
