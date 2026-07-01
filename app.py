@@ -665,6 +665,120 @@ def format_variant(result):
 
     return "\n".join(lines)
 
+_glass_svg_counter = 0
+
+# Paleta 8 barev v zelené škále – každá ingredience dostane unikátní barvu
+# podle svého pořadí (index % len(palette)).
+GLASS_PALETTE = [
+    '#1B4332',  # tmavě zelená - spirit
+    '#52B788',  # středně zelená - key1
+    '#95D5B2',  # světle zelená
+    '#D8F3DC',  # velmi světle zelená
+    '#B7E4C7',  # světle zelená 2
+    '#ECFCCB',  # žlutozelená
+    '#FEF9C3',  # světle žlutá
+    '#E8F5E9',  # nejsvětlejší zelená
+]
+
+def _build_glass_color_map(amounts_ml):
+    """Přiřadí každé ingredienci unikátní barvu podle pořadí (index % len(palette))."""
+    return {
+        name: GLASS_PALETTE[i % len(GLASS_PALETTE)]
+        for i, name in enumerate(amounts_ml.keys())
+    }
+
+def generate_glass_svg(title, amounts_ml, spirit=None, key1=None, key2=None):
+    global _glass_svg_counter
+
+    total = sum(amounts_ml.values())
+    if total == 0:
+        return ''
+
+    color_map = _build_glass_color_map(amounts_ml)
+
+    def layer_label(name):
+        if name == 'spirit':
+            return _cz_ingredient(spirit) if spirit else 'spirit'
+        if name == 'key1':
+            return _cz_ingredient(key1) if key1 else 'key1'
+        if name == 'key2':
+            return _cz_ingredient(key2) if key2 else 'key2'
+        return _cz_ingredient(name)
+
+    # -------- tvar sklenice podle stylu --------
+    t = title.lower()
+    if 'sour' in t:
+        # rocks glass – široký nízký obdélník
+        shape = '<rect x="15" y="135" width="120" height="100" rx="4"/>'
+        deco = ''
+        by, bh = 135, 100
+    elif 'highball' in t:
+        # highball – úzký vysoký obdélník
+        shape = '<rect x="45" y="35" width="60" height="200" rx="4"/>'
+        deco = ''
+        by, bh = 35, 200
+    elif 'signature' in t:
+        # coupette – mělká miska s jemně zaobleným dnem na nožce
+        shape = '<path d="M25,62 L135,62 Q135,98 80,104 Q25,98 25,62 Z"/>'
+        deco = ('<line x1="80" y1="104" x2="80" y2="205" stroke="#1B4332" stroke-width="2"/>'
+                '<line x1="52" y1="205" x2="108" y2="205" stroke="#1B4332" stroke-width="2"/>')
+        by, bh = 62, 42
+    elif 'spritz' in t:
+        # wine glass – kulatá miska na nožce
+        shape = '<path d="M38,60 L122,60 Q122,138 80,138 Q38,138 38,60 Z"/>'
+        deco = ('<line x1="80" y1="138" x2="80" y2="210" stroke="#1B4332" stroke-width="2"/>'
+                '<line x1="52" y1="210" x2="108" y2="210" stroke="#1B4332" stroke-width="2"/>')
+        by, bh = 60, 78
+    else:
+        # short cocktail – martini, obrácený trojúhelník na nožce
+        shape = '<polygon points="22,55 138,55 80,128"/>'
+        deco = ('<line x1="80" y1="128" x2="80" y2="205" stroke="#1B4332" stroke-width="2"/>'
+                '<line x1="52" y1="205" x2="108" y2="205" stroke="#1B4332" stroke-width="2"/>')
+        by, bh = 55, 73
+
+    _glass_svg_counter += 1
+    clip_id = f"glass_clip_{_glass_svg_counter}"
+
+    # -------- vrstvy tekutiny (odspodu nahoru), oříznuté na tvar --------
+    layers = []
+    draw_order = [(n, ml) for n, ml in reversed(list(amounts_ml.items())) if ml > 0]
+    y_offset = by + bh
+    for name, ml in draw_order:
+        layer_h = ml / total * bh
+        y_offset -= layer_h
+        layers.append(
+            f'<rect x="5" y="{y_offset:.1f}" width="150" height="{layer_h:.1f}" '
+            f'fill="{color_map[name]}" clip-path="url(#{clip_id})" opacity="0.9"/>'
+        )
+
+    outline = shape.replace('/>', ' fill="none" stroke="#1B4332" stroke-width="1.5"/>', 1)
+
+    # -------- popisky vrstev (odshora dolů) --------
+    labels = []
+    label_names = [n for n, _ in draw_order][::-1]
+    ly = 60
+    for name in label_names:
+        ml = amounts_ml[name]
+        color = color_map[name]
+        lbl = layer_label(name)
+        labels.append(f'<rect x="148" y="{ly-8}" width="10" height="10" rx="2" fill="{color}" stroke="#1B4332" stroke-width="0.5"/>')
+        labels.append(f'<text x="162" y="{ly}" font-size="9" fill="#1B4332">{lbl}: {ml}ml</text>')
+        ly += 16
+
+    # Single-line SVG: indentované řádky by Streamlit markdown interpretoval
+    # jako code block (SVG kód by se zobrazil jako text).
+    svg = (
+        f'<svg width="400" height="260" xmlns="http://www.w3.org/2000/svg">'
+        f'<defs><clipPath id="{clip_id}">{shape}</clipPath></defs>'
+        f'<g transform="translate(30, 0)">'
+        f'{"".join(layers)}{deco}{outline}{"".join(labels)}'
+        f'</g>'
+        f'</svg>'
+    )
+
+    # Posun celého SVG doprava (margin-left na wrapperu).
+    return f'<div style="margin-left:20px;">{svg}</div>'
+
 def format_why_box(result):
     """'PROČ TO FUNGUJE' jako stylovaný box (světle šedé pozadí, zelený akcent)."""
     if not result.notes:
@@ -897,7 +1011,12 @@ if st.session_state.results:
         style = r.title[r.title.find("(")+1:r.title.rfind(")")] if "(" in r.title else r.title
         with st.expander(f"Variant {i}: {style}", expanded=(i == 1)):
             st.markdown(format_core_badges(r), unsafe_allow_html=True)
-            st.markdown(format_variant(r))
+            col_recipe, col_glass = st.columns([1.5, 1.5])
+            with col_recipe:
+                st.markdown(format_variant(r))
+            with col_glass:
+                svg = generate_glass_svg(r.title, r.amounts_ml, r.spirit, r.key1, r.key2)
+                st.markdown(svg, unsafe_allow_html=True)
             why = format_why_box(r)
             if why:
                 st.markdown(why, unsafe_allow_html=True)
@@ -925,7 +1044,12 @@ if do_generate:
             style = r.title[r.title.find("(")+1:r.title.rfind(")")] if "(" in r.title else r.title
             with st.expander(f"Variant {i}: {style}", expanded=(i == 1)):
                 st.markdown(format_core_badges(r), unsafe_allow_html=True)
-                st.markdown(format_variant(r))
+                col_recipe, col_glass = st.columns([1.5, 1.5])
+                with col_recipe:
+                    st.markdown(format_variant(r))
+                with col_glass:
+                    svg = generate_glass_svg(r.title, r.amounts_ml, r.spirit, r.key1, r.key2)
+                    st.markdown(svg, unsafe_allow_html=True)
                 why = format_why_box(r)
                 if why:
                     st.markdown(why, unsafe_allow_html=True)
