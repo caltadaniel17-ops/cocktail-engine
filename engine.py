@@ -993,7 +993,7 @@ def calc_spirit_ml(spirit: str, build_rule: dict, title: str = "") -> float:
 
 def pick_top_up(spirit: str, title: str, spirit_families: List[str]) -> Optional[str]:
     if "Spritz" in title:
-        return "soda_water"
+        return "soda"
     if "Highball" in title:
         s = spirit.lower()
         if "gin" in s:
@@ -1002,7 +1002,7 @@ def pick_top_up(spirit: str, title: str, spirit_families: List[str]) -> Optional
             return "ginger_beer"
         if "whisky" in s or "whiskey" in s or "bourbon" in s:
             return "ginger_ale"
-        return "soda_water"
+        return "soda"
     return None
 
 

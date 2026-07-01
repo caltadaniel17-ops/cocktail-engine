@@ -1565,7 +1565,7 @@ INGREDIENTS: List[Ingredient] = [
         "temperature": "warm",
     },
     {
-        "name": "soda_water",
+        "name": "soda",
         "families": ["mineral_saline"],
         "intensity": 1,
         "roles": ["structural_modifier"],
@@ -2255,7 +2255,22 @@ UI_INGREDIENT_CATEGORY_BY_NAME: Dict[str, str] = {}
 
 # Classic spirits
 for name in ALCOHOL_SUBCATEGORIES.keys():
-    UI_CATEGORY_BY_NAME[name] = "spirits"
+    if "campari" in name:
+        UI_CATEGORY_BY_NAME[name] = "aperitifs"
+    else:
+        UI_CATEGORY_BY_NAME[name] = "spirits"
+
+# Výjimky - aperitivy které jsou v ALCOHOL_SUBCATEGORIES
+UI_CATEGORY_BY_NAME["campari"] = "aperitifs"
+UI_CATEGORY_BY_NAME["gentian_aperitif"] = "aperitifs"
+UI_CATEGORY_BY_NAME["amaro_light"] = "aperitifs"
+UI_CATEGORY_BY_NAME["amaro_dark"] = "aperitifs"
+UI_CATEGORY_BY_NAME["amaro_bitter_aperitif"] = "aperitifs"
+UI_CATEGORY_BY_NAME["quinquina"] = "aperitifs"
+UI_CATEGORY_BY_NAME["dry_vermouth"] = "fortified_wines"
+UI_CATEGORY_BY_NAME["bianco_vermouth"] = "fortified_wines"
+UI_CATEGORY_BY_NAME["sweet_vermouth"] = "fortified_wines"
+
 # Spirit subcategories
 for name in ALCOHOL_SUBCATEGORIES.keys():
 
@@ -2386,7 +2401,7 @@ _INGR_MAIN: Dict[str, str] = {
     ]},
     # TOP-UP NÁPOJE
     **{n: "topup_napoje" for n in [
-        "soda_water", "tonic_water", "ginger_beer", "ginger_ale",
+        "soda", "tonic_water", "ginger_beer", "ginger_ale",
         "sprite", "cola", "pink_tonic", "lemonade",
     ]},
 }
@@ -2472,7 +2487,7 @@ _INGR_SUBCAT: Dict[str, str] = {
         "gentian", "dandelion", "grapefruit_zest",
     ]},
     **{n: "topup_napoje" for n in [
-        "soda_water", "tonic_water", "ginger_beer", "ginger_ale",
+        "soda", "tonic_water", "ginger_beer", "ginger_ale",
         "sprite", "cola", "pink_tonic", "lemonade",
     ]},
 }
@@ -2620,7 +2635,8 @@ CZ_INGREDIENT_NAME: Dict[str, str] = {
     "mineral_water":       "Minerální voda",
     "oyster_shell":        "Ústřicová skořápka",
     "white_sesame_salt":   "Bílá sezamová sůl",
-    "soda_water":          "Sodová voda",
+    "soda_water":          "Soda",
+    "soda":                "Soda",
     "tonic_water":         "Tonik",
     "ginger_beer":         "Zázvorové pivo",
     "ginger_ale":          "Zázvorová limonáda",

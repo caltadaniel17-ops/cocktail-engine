@@ -13,7 +13,7 @@ ALCOHOL_CATEGORIES = [
 ]
 
 _SPARKLING_KW = ["prosecco", "champagne", "cava", "cremant", "sparkling", "pet_nat"]
-_APERITIF_ALCO_SUB_KW = ["vermouth", "quinquina", "aperitif", "amaro"]
+_APERITIF_ALCO_SUB_KW = ["vermouth", "quinquina", "aperitif", "amaro", "campari", "gentian"]
 _FORTIFIED_KW = ["sherry", "port", "vermouth"]
 _APERITIF_INGR_KW = ["lillet", "cocchi", "quinquina", "byrrh", "aperitif", "amaro"]
 
