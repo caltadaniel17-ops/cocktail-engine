@@ -1,7 +1,11 @@
+import random
+
 import streamlit as st
 import flavor_data
 import engine
 import favourites
+
+RANDOM_SENTINEL = "🎲 Náhodný výběr"
 
 ALCOHOL_CATEGORIES = [
     "Spirits",
@@ -844,7 +848,15 @@ st.sidebar.divider()
 
 alcohol_mapping = build_new_alcohol_mapping()
 
-_spirit_default = "london_dry_gin"
+# Náhodný default při prvním načtení stránky (jednou za session).
+if "default_spirit" not in st.session_state:
+    st.session_state.default_spirit = random.choice(get_spirit_names())
+if "default_key1" not in st.session_state:
+    st.session_state.default_key1 = random.choice(
+        _visible_ingredients(flavor_data.UI_INGREDIENT_CATEGORY_BY_NAME.keys())
+    )
+
+_spirit_default = st.session_state.default_spirit
 _default_category = next(
     (cat for cat, names in alcohol_mapping.items() if _spirit_default in names),
     ALCOHOL_CATEGORIES[0],
@@ -869,8 +881,8 @@ if alcohol_search.strip():
 
     spirit = st.sidebar.selectbox(
         "Alkohol",
-        options=matching_spirits if matching_spirits else all_spirits,
-        format_func=_pretty,
+        options=[RANDOM_SENTINEL] + (matching_spirits if matching_spirits else all_spirits),
+        format_func=lambda n: n if n == RANDOM_SENTINEL else _pretty(n),
     )
 
 else:
@@ -882,12 +894,13 @@ else:
     )
 
     available_spirits = alcohol_mapping[alcohol_category]
+    _spirit_options = [RANDOM_SENTINEL] + available_spirits
 
     spirit = st.sidebar.selectbox(
         "Alkohol",
-        options=available_spirits,
-        index=available_spirits.index(_spirit_default) if _spirit_default in available_spirits else 0,
-        format_func=_pretty,
+        options=_spirit_options,
+        index=_spirit_options.index(_spirit_default) if _spirit_default in _spirit_options else 0,
+        format_func=lambda n: n if n == RANDOM_SENTINEL else _pretty(n),
     )
 
 grouped_ingredients = build_grouped_ingredient_options()
@@ -915,12 +928,12 @@ if ingredient_search.strip():
 
     key1 = st.sidebar.selectbox(
         "Hlavní ingredience",
-        options=matching_ingredients if matching_ingredients else all_ingredients,
-        format_func=_cz_ingredient,
+        options=[RANDOM_SENTINEL] + (matching_ingredients if matching_ingredients else all_ingredients),
+        format_func=lambda n: n if n == RANDOM_SENTINEL else _cz_ingredient(n),
     )
 
 else:
-    _default_key1 = "green_apple_fresh"
+    _default_key1 = st.session_state.default_key1
     _main_cats = list(flavor_data.SUBCATEGORIES_BY_MAIN.keys())
     _default_main = flavor_data.UI_INGREDIENT_MAIN_CATEGORY.get(_default_key1, _main_cats[0])
 
@@ -943,8 +956,8 @@ else:
         )
         key1 = st.sidebar.selectbox(
             "Hlavní ingredience",
-            options=_available,
-            format_func=_cz_ingredient,
+            options=[RANDOM_SENTINEL] + _available,
+            format_func=lambda n: n if n == RANDOM_SENTINEL else _cz_ingredient(n),
         )
     else:
         _default_subcat = flavor_data.UI_INGREDIENT_CATEGORY_BY_NAME.get(_default_key1)
@@ -965,26 +978,33 @@ else:
             key=lambda x: x.lower(),
         )
 
+        _key1_options = [RANDOM_SENTINEL] + _available
         key1 = st.sidebar.selectbox(
             "Hlavní ingredience",
-            options=_available,
-            index=_available.index(_default_key1) if _default_key1 in _available else 0,
-            format_func=_cz_ingredient,
+            options=_key1_options,
+            index=_key1_options.index(_default_key1) if _default_key1 in _key1_options else 0,
+            format_func=lambda n: n if n == RANDOM_SENTINEL else _cz_ingredient(n),
         )
 
 use_key2 = st.sidebar.checkbox("Přidat druhou ingredienci", value=False)
 key2 = None
 if use_key2:
     # prevent same as key1
-    key2_options = [n for n in all_ingredients if n != key1]
-    key2 = st.sidebar.selectbox("Druhá ingredience", key2_options, format_func=_cz_ingredient)
+    key2_options = [RANDOM_SENTINEL] + [n for n in all_ingredients if n != key1]
+    key2 = st.sidebar.selectbox(
+        "Druhá ingredience",
+        key2_options,
+        format_func=lambda n: n if n == RANDOM_SENTINEL else _cz_ingredient(n),
+    )
 
 use_extra_alcohol = st.sidebar.checkbox("Přidat druhý alkohol", value=False)
 extra_alcohol = None
 if use_extra_alcohol:
-    extra_alcohol_options = [n for n in get_spirit_names() if n != spirit]
+    extra_alcohol_options = [RANDOM_SENTINEL] + [n for n in get_spirit_names() if n != spirit]
     extra_alcohol = st.sidebar.selectbox(
-        "Druhý alkohol", extra_alcohol_options, format_func=_pretty
+        "Druhý alkohol",
+        extra_alcohol_options,
+        format_func=lambda n: n if n == RANDOM_SENTINEL else _pretty(n),
     )
 
 target_ml = 90
@@ -1010,15 +1030,36 @@ def run_generation(increment_seed: bool):
     if increment_seed:
         st.session_state.seed += 1
 
-    # engine uses random internally; set seed if engine.py exposes it.
-    # If not, we can still vary results by temporarily using python's random seed here,
-    # but we avoid importing random to keep it simple unless needed.
+    # Vyřeš sentinely na konkrétní náhodné hodnoty, čerstvě při KAŽDÉM volání
+    # (i "Generovat další" vylosuje novou položku).
+    resolved_spirit = spirit
+    if spirit == RANDOM_SENTINEL:
+        resolved_spirit = random.choice(get_spirit_names())
+
+    resolved_key1 = key1
+    if key1 == RANDOM_SENTINEL:
+        resolved_key1 = random.choice(
+            [n for n in _visible_ingredients(flavor_data.UI_INGREDIENT_CATEGORY_BY_NAME.keys())]
+        )
+
+    resolved_key2 = key2
+    if key2 == RANDOM_SENTINEL:
+        resolved_key2 = random.choice(
+            [n for n in all_ingredients if n != resolved_key1]
+        )
+
+    resolved_extra_alcohol = extra_alcohol
+    if extra_alcohol == RANDOM_SENTINEL:
+        resolved_extra_alcohol = random.choice(
+            [n for n in get_spirit_names() if n != resolved_spirit]
+        )
+
     results = engine.generate(
-        spirit=spirit,
-        key1=key1,
-        key2=key2,
+        spirit=resolved_spirit,
+        key1=resolved_key1,
+        key2=resolved_key2,
         target_ml=target_ml,
-        extra_alcohol=extra_alcohol,
+        extra_alcohol=resolved_extra_alcohol,
     )
     return results
 
