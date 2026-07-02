@@ -23,7 +23,7 @@ SCOPES = [
     "https://www.googleapis.com/auth/drive",
 ]
 
-HEADERS = ["Datum", "Spirit", "Key1", "Key2", "Název", "Recept", "Příprava", "Poznámka"]
+HEADERS = ["Datum", "Spirit", "Key1", "Key2", "Extra alkohol", "Název", "Recept", "Příprava", "Poznámka"]
 
 
 def _creds_from_streamlit_secrets():
@@ -80,6 +80,8 @@ def _build_recipe_text(result) -> str:
     parts.append(f"{_cz_name(result.key1)}: {result.amounts_ml['key1']}ml")
     if result.key2:
         parts.append(f"{_cz_name(result.key2)}: {result.amounts_ml.get('key2', 0)}ml")
+    if getattr(result, "extra_alcohol", None):
+        parts.append(f"{_cz_name(result.extra_alcohol)}: {result.amounts_ml.get('extra_alcohol', 0)}ml")
     for name in result.extras:
         parts.append(f"{_cz_name(name)}: {result.amounts_ml[name]}ml")
     return ", ".join(parts)
@@ -93,6 +95,7 @@ def save_favourite(result, note: str = "") -> None:
         result.spirit.replace("_", " ").title(),
         result.key1.replace("_", " ").title(),
         result.key2 or "",
+        (result.extra_alcohol or "").replace("_", " ").title(),
         result.title,
         _build_recipe_text(result),
         result.preparation,

@@ -281,6 +281,7 @@ class VariantResult:
     bridge_inserts: List[Tuple[str, str, str, str, bool, Optional[str]]]  # (fam_a, fam_b, bridge_family, ingredient, micro, reduced_sweet)
     notes: List[str]
     preparation: str = ""
+    extra_alcohol: Optional[str] = None   # optional second (smaller) alcohol / modifier dash
 
 
 # -----------------------------
@@ -318,6 +319,12 @@ def has_role(name: str, role: str) -> bool:
 
 def families_of(name: str) -> List[str]:
     return ing(name)["families"]
+
+def alcohol_families_of(name: str) -> List[str]:
+    """Families for an alcohol that may be a classic spirit or a DB ingredient."""
+    if name in flavor_data.ALCOHOL_SUBCATEGORIES:
+        return flavor_data.ALCOHOL_SUBCATEGORIES[name]
+    return families_of(name)
 
 def taste_of(name: str) -> Dict[str, int]:
     return ing(name)["taste"]
@@ -424,7 +431,7 @@ def pick_from(bucket: List[Tuple[int, str]], avoid: set[str], n_pool: int) -> Op
     return random.choice(pool) if pool else None
 
 
-def generate_base_variants(spirit: str, key1: str, key2: Optional[str]) -> List[Tuple[str, List[str]]]:
+def generate_base_variants(spirit: str, key1: str, key2: Optional[str], extra_alcohol: Optional[str] = None) -> List[Tuple[str, List[str]]]:
     """
     Returns list of (title, extras) where extras exclude spirit and keys.
     """
@@ -433,8 +440,13 @@ def generate_base_variants(spirit: str, key1: str, key2: Optional[str]) -> List[
     else:
         spirit_fams = families_of(spirit)
 
-    core_fams = spirit_fams + families_of(key1) + (families_of(key2) if key2 else [])
-    exclude = {key1} | ({key2} if key2 else set())
+    core_fams = (
+        spirit_fams
+        + families_of(key1)
+        + (families_of(key2) if key2 else [])
+        + (alcohol_families_of(extra_alcohol) if extra_alcohol else [])
+    )
+    exclude = {key1} | ({key2} if key2 else set()) | ({extra_alcohol} if extra_alcohol else set())
 
     buckets = build_buckets(core_fams, exclude_names=exclude, spirit=spirit)
 
@@ -904,12 +916,14 @@ def apply_micro_bridge_adjustments(extras: List[str], ml: Dict[str, float], inse
             ml[name] = 5.0
     return ml
 
-def finalize_rounding(spirit_ml: float, key1_ml: float, key2_ml: float, extras: List[str], extras_ml: Dict[str, float], target_ml: int) -> Dict[str, float]:
+def finalize_rounding(spirit_ml: float, key1_ml: float, key2_ml: float, extras: List[str], extras_ml: Dict[str, float], target_ml: int, extra_alcohol_ml: float = 0.0) -> Dict[str, float]:
     rounded: Dict[str, float] = {}
     rounded["spirit"] = round_to_step(spirit_ml, MICRO_STEP)
     rounded["key1"] = round_to_step(key1_ml, ROUND_STEP)
     if key2_ml > 0:
         rounded["key2"] = round_to_step(key2_ml, ROUND_STEP)
+    if extra_alcohol_ml > 0:
+        rounded["extra_alcohol"] = round_to_step(extra_alcohol_ml, MICRO_STEP)
 
     for n in extras:
         v = extras_ml.get(n, 0.0)
@@ -1010,12 +1024,13 @@ def pick_top_up(spirit: str, title: str, spirit_families: List[str]) -> Optional
 # Public function
 # -----------------------------
 
-def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int = TARGET_ML_DEFAULT, seed: Optional[int] = None) -> List[VariantResult]:
-   
+def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int = TARGET_ML_DEFAULT, seed: Optional[int] = None, extra_alcohol: Optional[str] = None) -> List[VariantResult]:
+
     # Resolve user-friendly inputs (substring + aliases)
     spirit = resolve_spirit_name(spirit)
     key1 = resolve_ingredient_name(key1)
     key2 = resolve_ingredient_name(key2) if key2 else None
+    extra_alcohol = resolve_spirit_name(extra_alcohol) if extra_alcohol else None
 
     if seed is not None:
         random.seed(seed)
@@ -1035,15 +1050,27 @@ def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int 
     if key2 and key2 not in flavor_data.INGREDIENT_BY_NAME:
         raise ValueError(f"Unknown key2 ingredient: {key2}")
 
+    if extra_alcohol:
+        extra_is_classic = extra_alcohol in flavor_data.ALCOHOL_SUBCATEGORIES
+        extra_is_ingredient_alcohol = (
+            extra_alcohol in flavor_data.INGREDIENT_BY_NAME
+            and ing(extra_alcohol).get("alcohol_type") in ["base", "modifier", "light"]
+        )
+        if not extra_is_classic and not extra_is_ingredient_alcohol:
+            raise ValueError(f"Unknown extra alcohol: {extra_alcohol}")
+
     if spirit_is_classic:
         spirit_fams = flavor_data.ALCOHOL_SUBCATEGORIES[spirit]
     else:
         spirit_fams = families_of(spirit)
 
     key_fams = families_of(key1) + (families_of(key2) if key2 else [])
-    key_names = {key1} | ({key2} if key2 else set())
+    key_names = {key1} | ({key2} if key2 else set()) | ({extra_alcohol} if extra_alcohol else set())
 
-    base_variants = generate_base_variants(spirit, key1, key2)
+    # fixed volume of the optional second alcohol (modifier dash)
+    extra_alcohol_ml = 15.0 if extra_alcohol else 0.0
+
+    base_variants = generate_base_variants(spirit, key1, key2, extra_alcohol)
 
     _MODIFIER_KEYWORDS = ("vermouth", "amaro", "aperitif", "campari", "aperol", "quinquina", "gentian")
     spirit_is_modifier = (
@@ -1122,7 +1149,7 @@ def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int 
             extras_ml = apply_micro_bridge_adjustments(extras2, extras_ml, inserts, target_ml_local)
 
         # compute spirit from category build rule
-        non_spirit_total = key1_ml + key2_ml + sum(extras_ml.get(n, 0.0) for n in extras2)
+        non_spirit_total = key1_ml + key2_ml + extra_alcohol_ml + sum(extras_ml.get(n, 0.0) for n in extras2)
 
         if "Spritz" in title:
             if spirit in flavor_data.ALCOHOL_ABV:
@@ -1133,10 +1160,10 @@ def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int 
                 _spirit_abv = 40.0
             spirit_ml = 0.0 if _spirit_abv < 35.0 else 30.0
         else:
-            spirit_ml = calc_spirit_ml(spirit, {**build_rule, "target_ml": float(target_ml_local)}, title)
+            spirit_ml = calc_spirit_ml(spirit, {**build_rule, "target_ml": float(target_ml_local) - extra_alcohol_ml}, title)
 
         # rounding
-        amounts = finalize_rounding(spirit_ml, key1_ml, key2_ml, extras2, extras_ml, target_ml_local)
+        amounts = finalize_rounding(spirit_ml, key1_ml, key2_ml, extras2, extras_ml, target_ml_local, extra_alcohol_ml)
 
         if "Spritz" in title and spirit_is_modifier:
             amounts["modifier_ml"] = 45.0
@@ -1189,6 +1216,7 @@ def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int 
                 spirit=spirit,
                 key1=key1,
                 key2=key2,
+                extra_alcohol=extra_alcohol,
                 extras=extras2,
                 amounts_ml=amounts,
                 harmony_score=harmony,

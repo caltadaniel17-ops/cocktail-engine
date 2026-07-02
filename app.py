@@ -648,6 +648,10 @@ def format_core_badges(result):
         parts.append(
             f'<span class="ingredient-badge">{_cz_ingredient(result.key2)}</span>'
         )
+    if result.extra_alcohol:
+        parts.append(
+            f'<span class="ingredient-badge">{_pretty(result.extra_alcohol)}</span>'
+        )
     return '<div class="badge-row">' + "".join(parts) + "</div>"
 
 def format_variant(result):
@@ -660,6 +664,8 @@ def format_variant(result):
     lines.append(f"- **{_cz_ingredient(result.key1)}**: {result.amounts_ml['key1']} ml")
     if result.key2:
         lines.append(f"- **{_cz_ingredient(result.key2)}**: {result.amounts_ml.get('key2', 0)} ml")
+    if result.extra_alcohol:
+        lines.append(f"- **{_pretty(result.extra_alcohol)}**: {result.amounts_ml.get('extra_alcohol', 0)} ml")
     for n in result.extras:
         lines.append(f"- {_cz_ingredient(n)}: {result.amounts_ml[n]} ml")
 
@@ -687,7 +693,7 @@ def _build_glass_color_map(amounts_ml):
         for i, name in enumerate(amounts_ml.keys())
     }
 
-def generate_glass_svg(title, amounts_ml, spirit=None, key1=None, key2=None):
+def generate_glass_svg(title, amounts_ml, spirit=None, key1=None, key2=None, extra_alcohol=None):
     global _glass_svg_counter
 
     total = sum(amounts_ml.values())
@@ -703,6 +709,8 @@ def generate_glass_svg(title, amounts_ml, spirit=None, key1=None, key2=None):
             return _cz_ingredient(key1) if key1 else 'key1'
         if name == 'key2':
             return _cz_ingredient(key2) if key2 else 'key2'
+        if name == 'extra_alcohol':
+            return _pretty(extra_alcohol) if extra_alcohol else 'extra_alcohol'
         return _cz_ingredient(name)
 
     # -------- tvar sklenice podle stylu --------
@@ -821,6 +829,8 @@ if st.sidebar.button("📋 Zobrazit uložené varianty", key="show_saved"):
                     st.write(f"**Key1:** {row.get('Key1','')}")
                     if row.get("Key2"):
                         st.write(f"**Key2:** {row.get('Key2','')}")
+                    if row.get("Extra alkohol"):
+                        st.write(f"**Extra alkohol:** {row.get('Extra alkohol','')}")
                     st.write(f"**Recept:** {row.get('Recept','')}")
                     st.write(f"**Příprava:** {row.get('Příprava','')}")
                     if row.get("Poznámka"):
@@ -840,21 +850,45 @@ _default_category = next(
     ALCOHOL_CATEGORIES[0],
 )
 
-alcohol_category = st.sidebar.selectbox(
-    "Kategorie alkoholu",
-    options=ALCOHOL_CATEGORIES,
-    index=ALCOHOL_CATEGORIES.index(_default_category),
-    format_func=_cz_alcohol_cat,
+alcohol_search = st.sidebar.text_input(
+    "Hledat alkohol",
+    value="",
+    placeholder="Např. gin, rum, sherry...",
 )
 
-available_spirits = alcohol_mapping[alcohol_category]
+if alcohol_search.strip():
+    search_text = alcohol_search.strip().lower()
 
-spirit = st.sidebar.selectbox(
-    "Alkohol",
-    options=available_spirits,
-    index=available_spirits.index(_spirit_default) if _spirit_default in available_spirits else 0,
-    format_func=_pretty,
-)
+    all_spirits = get_spirit_names()
+    matching_spirits = [
+        name
+        for name in all_spirits
+        if search_text in name.lower()
+        or search_text in _pretty(name).lower()
+    ]
+
+    spirit = st.sidebar.selectbox(
+        "Alkohol",
+        options=matching_spirits if matching_spirits else all_spirits,
+        format_func=_pretty,
+    )
+
+else:
+    alcohol_category = st.sidebar.selectbox(
+        "Kategorie alkoholu",
+        options=ALCOHOL_CATEGORIES,
+        index=ALCOHOL_CATEGORIES.index(_default_category),
+        format_func=_cz_alcohol_cat,
+    )
+
+    available_spirits = alcohol_mapping[alcohol_category]
+
+    spirit = st.sidebar.selectbox(
+        "Alkohol",
+        options=available_spirits,
+        index=available_spirits.index(_spirit_default) if _spirit_default in available_spirits else 0,
+        format_func=_pretty,
+    )
 
 grouped_ingredients = build_grouped_ingredient_options()
 
@@ -945,9 +979,17 @@ if use_key2:
     key2_options = [n for n in all_ingredients if n != key1]
     key2 = st.sidebar.selectbox("Druhá ingredience", key2_options, format_func=_cz_ingredient)
 
+use_extra_alcohol = st.sidebar.checkbox("Přidat druhý alkohol", value=False)
+extra_alcohol = None
+if use_extra_alcohol:
+    extra_alcohol_options = [n for n in get_spirit_names() if n != spirit]
+    extra_alcohol = st.sidebar.selectbox(
+        "Druhý alkohol", extra_alcohol_options, format_func=_pretty
+    )
+
 target_ml = 90
 
-current_params = (spirit, key1, key2, target_ml)
+current_params = (spirit, key1, key2, target_ml, extra_alcohol)
 
 if st.session_state.last_inputs is not None and current_params != st.session_state.last_inputs:
     st.info("Parametry se změnily. Klikni na 'Generovat varianty' pro přepočet.")
@@ -976,6 +1018,7 @@ def run_generation(increment_seed: bool):
         key1=key1,
         key2=key2,
         target_ml=target_ml,
+        extra_alcohol=extra_alcohol,
     )
     return results
 
@@ -985,7 +1028,7 @@ inc = False
 
 if generate_clicked:
     st.session_state.results = []  # reset
-    st.session_state.last_inputs = (spirit, key1, key2, target_ml)
+    st.session_state.last_inputs = (spirit, key1, key2, target_ml, extra_alcohol)
 
     try:
         new_results = run_generation(increment_seed=False)
@@ -994,7 +1037,7 @@ if generate_clicked:
         st.error(f"Něco se pokazilo: {type(e).__name__}: {e}")
 
 if more_clicked:
-    if st.session_state.last_inputs == (spirit, key1, key2, target_ml):
+    if st.session_state.last_inputs == (spirit, key1, key2, target_ml, extra_alcohol):
         try:
             new_results = run_generation(increment_seed=True)
             st.session_state.results.extend(new_results)
@@ -1015,7 +1058,7 @@ if st.session_state.results:
             with col_recipe:
                 st.markdown(format_variant(r))
             with col_glass:
-                svg = generate_glass_svg(r.title, r.amounts_ml, r.spirit, r.key1, r.key2)
+                svg = generate_glass_svg(r.title, r.amounts_ml, r.spirit, r.key1, r.key2, r.extra_alcohol)
                 st.markdown(svg, unsafe_allow_html=True)
             why = format_why_box(r)
             if why:
@@ -1048,7 +1091,7 @@ if do_generate:
                 with col_recipe:
                     st.markdown(format_variant(r))
                 with col_glass:
-                    svg = generate_glass_svg(r.title, r.amounts_ml, r.spirit, r.key1, r.key2)
+                    svg = generate_glass_svg(r.title, r.amounts_ml, r.spirit, r.key1, r.key2, r.extra_alcohol)
                     st.markdown(svg, unsafe_allow_html=True)
                 why = format_why_box(r)
                 if why:
