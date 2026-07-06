@@ -1009,7 +1009,11 @@ if use_extra_alcohol:
 
 target_ml = 90
 
-current_params = (spirit, key1, key2, target_ml, extra_alcohol)
+max_ingredients = st.sidebar.slider(
+    "Max počet složek v koktejlu", min_value=3, max_value=6, value=6
+)
+
+current_params = (spirit, key1, key2, target_ml, extra_alcohol, max_ingredients)
 
 if st.session_state.last_inputs is not None and current_params != st.session_state.last_inputs:
     st.info("Parametry se změnily. Klikni na 'Generovat varianty' pro přepočet.")
@@ -1060,6 +1064,7 @@ def run_generation(increment_seed: bool):
         key2=resolved_key2,
         target_ml=target_ml,
         extra_alcohol=resolved_extra_alcohol,
+        max_ingredients=max_ingredients,
     )
     return results
 
@@ -1069,7 +1074,7 @@ inc = False
 
 if generate_clicked:
     st.session_state.results = []  # reset
-    st.session_state.last_inputs = (spirit, key1, key2, target_ml, extra_alcohol)
+    st.session_state.last_inputs = (spirit, key1, key2, target_ml, extra_alcohol, max_ingredients)
 
     try:
         new_results = run_generation(increment_seed=False)
@@ -1078,7 +1083,7 @@ if generate_clicked:
         st.error(f"Něco se pokazilo: {type(e).__name__}: {e}")
 
 if more_clicked:
-    if st.session_state.last_inputs == (spirit, key1, key2, target_ml, extra_alcohol):
+    if st.session_state.last_inputs == (spirit, key1, key2, target_ml, extra_alcohol, max_ingredients):
         try:
             new_results = run_generation(increment_seed=True)
             st.session_state.results.extend(new_results)

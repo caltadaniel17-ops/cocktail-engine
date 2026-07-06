@@ -1024,7 +1024,7 @@ def pick_top_up(spirit: str, title: str, spirit_families: List[str]) -> Optional
 # Public function
 # -----------------------------
 
-def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int = TARGET_ML_DEFAULT, seed: Optional[int] = None, extra_alcohol: Optional[str] = None) -> List[VariantResult]:
+def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int = TARGET_ML_DEFAULT, seed: Optional[int] = None, extra_alcohol: Optional[str] = None, max_ingredients: int = 6) -> List[VariantResult]:
 
     # Resolve user-friendly inputs (substring + aliases)
     spirit = resolve_spirit_name(spirit)
@@ -1118,6 +1118,32 @@ def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int 
         # HARD rule for Sour: remove any alcohol after bridges
         if "Sour" in title:
             extras2 = [e for e in extras2 if not is_alcoholic_ingredient(e)]
+
+        # Trim extras to respect the total ingredient limit (max_ingredients).
+        # Runs BEFORE any ml allocation so we don't compute amounts for
+        # ingredients that get cut anyway.
+        def _extras_priority(name: str) -> int:
+            # nižší číslo = vyšší priorita, zůstává v receptu déle
+            if name == "egg_white":
+                return 0
+            if has_role(name, "acid"):
+                return 1
+            if has_role(name, "sweet"):
+                return 2
+            if ing(name).get("alcohol_type") == "modifier":
+                return 3
+            return 4  # bridge inserts, accents, ostatní – ořezávají se první
+
+        core_count = 1 + 1 + (1 if key2 else 0) + (1 if extra_alcohol else 0)
+        reserve_topup = 1 if ("Highball" in title or "Spritz" in title) else 0
+        budget_for_extras = max(0, max_ingredients - core_count - reserve_topup)
+
+        if len(extras2) > budget_for_extras:
+            extras2 = sorted(extras2, key=_extras_priority)[:budget_for_extras]
+            # Drop bridge inserts that reference ingredients no longer present,
+            # so format_bridge_inserts doesn't show a bridge that isn't in the
+            # final recipe. i[3] = ingredient name.
+            inserts = [i for i in inserts if i[3] in extras2]
 
         # 2) ml allocation
         key1_ml = 20.0
