@@ -977,10 +977,19 @@ def recalc_amounts_ml(
 # ABV-based spirit volume
 # -----------------------------
 
-def calc_spirit_ml(spirit: str, build_rule: dict, title: str = "") -> float:
+def _abv_of(name: str) -> float:
+    if name in flavor_data.ALCOHOL_ABV:
+        return flavor_data.ALCOHOL_ABV[name]
+    if name in flavor_data.INGREDIENT_BY_NAME:
+        return float(flavor_data.INGREDIENT_BY_NAME[name].get("abv", 0.0))
+    return 0.0
+
+
+def calc_spirit_ml(spirit: str, build_rule: dict, title: str = "",
+                    other_alcohol_ml: Optional[Dict[str, float]] = None) -> float:
     """
-    Calculate spirit volume so the drink hits target ABV.
-    Formula: spirit_ml = (target_abv% * target_ml) / spirit_abv%
+    Calculate spirit volume so the drink hits target ABV, accounting for
+    alcohol already contributed by key2 / extra_alcohol / alcoholic extras.
     Clamped to [15, 60] ml and rounded to 2.5 ml steps.
     """
     if spirit in flavor_data.ALCOHOL_ABV:
@@ -996,8 +1005,15 @@ def calc_spirit_ml(spirit: str, build_rule: dict, title: str = "") -> float:
 
     target_abv = float(build_rule.get("target_abv", 18))
     target_ml = float(build_rule.get("target_ml", 90))
+    total_alcohol_ml_needed = target_abv / 100.0 * target_ml
 
-    raw = (target_abv / 100.0 * target_ml) / (spirit_abv / 100.0)
+    already_alcohol_ml = 0.0
+    if other_alcohol_ml:
+        for name, ml in other_alcohol_ml.items():
+            already_alcohol_ml += ml * (_abv_of(name) / 100.0)
+
+    remaining_alcohol_ml = max(0.0, total_alcohol_ml_needed - already_alcohol_ml)
+    raw = remaining_alcohol_ml / (spirit_abv / 100.0)
     return max(15.0, min(60.0, round_to_step(raw, MICRO_STEP)))
 
 
@@ -1186,7 +1202,18 @@ def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int 
                 _spirit_abv = 40.0
             spirit_ml = 0.0 if _spirit_abv < 35.0 else 30.0
         else:
-            spirit_ml = calc_spirit_ml(spirit, {**build_rule, "target_ml": float(target_ml_local) - extra_alcohol_ml}, title)
+            other_alcohol_ml = {}
+            if key2 and is_alcoholic_ingredient(key2):
+                other_alcohol_ml[key2] = key2_ml
+            if extra_alcohol:
+                other_alcohol_ml[extra_alcohol] = extra_alcohol_ml
+            for n in extras2:
+                if is_alcoholic_ingredient(n):
+                    other_alcohol_ml[n] = extras_ml.get(n, 0.0)
+            spirit_ml = calc_spirit_ml(
+                spirit, {**build_rule, "target_ml": float(target_ml_local)},
+                title, other_alcohol_ml=other_alcohol_ml,
+            )
 
         # rounding
         amounts = finalize_rounding(spirit_ml, key1_ml, key2_ml, extras2, extras_ml, target_ml_local, extra_alcohol_ml)
@@ -1216,12 +1243,49 @@ def generate(spirit: str, key1: str, key2: Optional[str] = None, target_ml: int 
                     if any(x in k for x in ["prosecco", "champagne", "cava", "cremant", "sparkling", "pet_nat"])
                 ]
                 adjust_key = sparkling_items[0] if sparkling_items else max(amounts, key=lambda k: amounts[k])
+                amounts[adjust_key] = round(amounts[adjust_key] + diff, 6)
             elif "Highball" in title and diff > 0:
                 top_up_name = pick_top_up(spirit, title, spirit_fams)
                 adjust_key = top_up_name if (top_up_name and top_up_name in amounts) else max(amounts, key=lambda k: amounts[k])
+                amounts[adjust_key] = round(amounts[adjust_key] + diff, 6)
             else:
-                adjust_key = max(amounts, key=lambda k: amounts[k])
-            amounts[adjust_key] = round(amounts[adjust_key] + diff, 6)
+                def _correction_candidates():
+                    order = []
+                    for n in extras2:
+                        if n in amounts and has_role(n, "sweet") and not is_alcoholic_ingredient(n):
+                            order.append(n)
+                    for n in extras2:
+                        if n in amounts and is_alcoholic_ingredient(n) and ing(n).get("alcohol_type") == "modifier":
+                            order.append(n)
+                    if "key1" in amounts:
+                        order.append("key1")
+                    if "spirit" in amounts:
+                        order.append("spirit")
+                    return order
+
+                remaining_diff = diff
+                for cand_key in _correction_candidates():
+                    if abs(remaining_diff) < 0.001:
+                        break
+                    current_val = amounts.get(cand_key, 0.0)
+                    if remaining_diff > 0:
+                        if cand_key == "spirit":
+                            max_increase = current_val * 0.20  # cap: spirit max +20% narůst
+                            apply = min(remaining_diff, max_increase) if max_increase > 0 else remaining_diff
+                        else:
+                            apply = remaining_diff
+                    else:
+                        if cand_key == "spirit":
+                            max_decrease = max(0.0, current_val - 15.0)  # neklesnout pod clamp z calc_spirit_ml
+                        else:
+                            max_decrease = current_val
+                        apply = -min(abs(remaining_diff), max_decrease)
+                    amounts[cand_key] = round(current_val + apply, 6)
+                    remaining_diff = round(remaining_diff - apply, 6)
+
+                # fallback, pokud kandidáti nestačili pokrýt celý diff
+                if abs(remaining_diff) >= 0.001 and "spirit" in amounts:
+                    amounts["spirit"] = round(amounts["spirit"] + remaining_diff, 6)
 
         # 3) harmony analysis (on final extras)
         harmony, direct, bridgeable, conflicts = analyze_harmony(spirit_fams, key_fams, extras2)
